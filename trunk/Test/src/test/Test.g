@@ -130,7 +130,7 @@ func_decl
 	currentTab = func;
 //	System.out.println("Printing Symbol Table for " + func.scopeId);
 	}
-		LP! param_decl_list? RP! K_BEGIN! func_body K_END!
+		LP! param_decl_list? RP! K_BEGIN! func_body K_END
 	{
 	currentTab = globalTab;	
 	}
