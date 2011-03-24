@@ -1,0 +1,211 @@
+grammar Test;
+
+options {
+	k=2;
+  language = Java;
+}
+@header {
+  package test;
+}
+
+@lexer::header {
+  package test;
+}
+
+
+
+
+/*****	PARSER	*****/
+/* Program */
+
+rule
+	:		K_PROGRAM id K_BEGIN pgm_body K_END 
+	;
+id
+//@after{
+//	System.out.println("Token Type: "+ "IDENTIFIER" + "\n" + "Value: " + $a.text);	
+//}                
+	:	IDENTIFIER
+	;
+pgm_body          
+	:	decl func_declarations
+	;
+decl		  
+	: decl_list*
+	;
+decl_list
+	: string_decl_list | var_decl_list
+	;
+	
+/* Global String Declaration */
+string_decl_list  
+	: string_decl+
+	;
+string_decl       
+	: K_STRING id ASSIGN str SEMICOL
+	;
+str               
+	: STRINGLITERAL
+	;
+
+/* Variable Declaration */
+var_decl_list     
+	: var_decl+ 
+	;
+var_decl          
+	: var_type var_id_list SEMICOL 
+	;
+var_type	  
+	: K_FLOAT | K_INT
+	;
+any_type          
+	: var_type | K_VOID 
+	;
+var_id_list
+	:	var_id (COMMA var_id)*           
+	;
+var_id
+	:	id
+	;
+id_list           
+	:  id (COMMA id)* 
+	;
+
+/* Function Paramater List */
+param_decl_list   
+	: param_decl param_decl_tail
+	;
+param_decl        
+	: var_type id
+	;
+param_decl_tail   
+		: ( COMMA param_decl )* 
+		;
+
+/* Function Declarations */
+func_declarations 
+	: func_decl*
+	;
+func_decl         
+	: K_FUNCTION any_type id LP param_decl_list? RP K_BEGIN func_body K_END
+	;
+func_body         
+	: decl stmt_list 
+	;
+
+/* Statement List */
+stmt_list         
+	: stmt*
+	;
+
+stmt              
+	: assign_stmt | read_stmt | write_stmt | return_stmt | if_stmt | for_stmt
+	;
+
+/* Basic Statements */
+assign_stmt       
+	: assign_expr SEMICOL
+	;
+assign_expr       
+	: id ASSIGN expr
+	;
+read_stmt         
+	: K_READ LP id_list RP SEMICOL
+	;
+write_stmt        
+	: K_WRITE LP id_list RP SEMICOL
+	;
+return_stmt       
+	: K_RETURN expr SEMICOL
+	;
+
+/* Expressions */
+expr              
+	: factor (addop factor)*
+	; 
+factor            
+	: postfix_expr (mulop postfix_expr)*
+	;
+postfix_expr      
+	: primary | call_expr
+	;
+call_expr         
+	: id LP expr_list? RP
+	;
+expr_list         
+	: expr (COMMA expr)*
+	;
+primary           	
+	: LP expr RP 
+	| id 
+	| INTLITERAL 
+	| FLOATLITERAL
+	;
+addop             
+	: ADD| SUB
+	;
+mulop             
+	: MULT | DIV
+	;
+
+/* Complex Statements and Condition */ 
+if_stmt           
+	: K_IF LP cond RP K_THEN stmt_list else_part K_ENDIF
+	;
+else_part         
+	: (K_ELSE stmt_list)?
+	;
+cond              
+	: expr compop expr
+	;
+compop            
+	: LT | GT | EQ
+	;
+for_stmt          
+	: K_FOR LP assign_expr? SEMICOL cond? SEMICOL assign_expr? RP stmt_list K_ENDFOR
+	;
+	
+/*****	LEXER	*****/		
+	K_PROGRAM :	'PROGRAM' {System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_BEGIN   : 'BEGIN'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_END     : 'END'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_PROTO   : 'PROTO'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_FUNCTION: 'FUNCTION'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_READ    : 'READ'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_WRITE   : 'WRITE'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 					
+	K_IF      : 'IF'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_THEN    : 'THEN'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_ELSE    : 'ELSE'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);}; 
+	K_ENDIF   : 'ENDIF'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_RETURN  : 'RETURN'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_FOR     : 'FOR'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_ENDFOR  : 'ENDFOR'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_FLOAT   : 'FLOAT'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_INT     : 'INT'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_VOID    : 'VOID'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	K_STRING  : 'STRING'{System.out.println("Token Type: "+ "KEYWORD" + "\n" + "Value: " + $text);};
+	ASSIGN    : ':='{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	ADD       : '+'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	SUB       : '-'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	MULT      : '*'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	DIV       : '/'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	GT        : '>'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	LT        : '<'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	EQ        : '='{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	LP        : '('{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	RP        : ')'{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	SEMICOL   : ';'	{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+	COMMA	  : ','	{System.out.println("Token Type: "+ "OPERATOR" + "\n" + "Value: " + $text);};
+
+IDENTIFIER	:	('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'_'| DIGIT)*
+			{System.out.println("Token Type: "+ "IDENTIFIER" + "\n" + "Value: " + $text);};
+INTLITERAL	:	DIGIT+	
+			{System.out.println("Token Type: "+ "INTLITERAL" + "\n" + "Value: " + $text);};
+FLOATLITERAL	:	DIGIT* '.' DIGIT+
+			{System.out.println("Token Type: "+ "FLOATLITERAL" + "\n" + "Value: " + $text);};
+STRINGLITERAL: '"'~('"')*'"'
+			{System.out.println("Token Type: "+ "STRINGLITERAL" + "\n" + "Value: " + $text);};
+COMMENT	:	'--' ~'\n'* '\n'	{ $channel=HIDDEN; };
+WS : (' '|'\r'|'\n'|'\t'|'\f')+ {$channel = HIDDEN;};
+fragment	
+DIGIT	:	('0'..'9');
