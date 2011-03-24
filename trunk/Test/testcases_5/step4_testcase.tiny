@@ -1,0 +1,49 @@
+var a
+var b
+var i
+var p
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label main
+link 0
+move 0 r0
+move r0 a
+move 0 r1
+move r1 b
+move 0 r2
+move r2 i
+label label1
+move 11 r3
+cmpi i r3
+jge label2
+sys readi p
+move 10 r4
+cmpi p r4
+jle label3
+move 1 r5
+move a r6
+addi r5 r6
+move r6 a
+jmp label4
+label label3
+move 1 r7
+move b r8
+addi r7 r8
+move r8 b
+label label4
+move 1 r9
+move i r10
+addi r9 r10
+move r10 i
+jmp label1
+label label2
+sys writei a
+sys writei b
+unlnk 
+ret 
+end

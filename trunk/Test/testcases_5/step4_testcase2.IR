@@ -1,0 +1,49 @@
+LABEL main 
+LINK  
+STOREI 1 $T1 
+STOREI $T1 a 
+LABEL label1 
+STOREI 121 $T2 
+GE a $T2 label2 
+STOREI 1 $T5 
+NE a $T5 label3 
+STOREI 1 $T6 
+MULTI $T6 a $T7 
+STOREI $T7 g 
+WRITEI g 
+JUMP label4 
+LABEL label3 
+LABEL label4 
+STOREI 2 $T8 
+NE a $T8 label5 
+STOREI 2 $T9 
+MULTI $T9 a $T10 
+STOREI $T10 p 
+WRITEI p 
+JUMP label6 
+LABEL label5 
+LABEL label6 
+STOREI 3 $T11 
+NE a $T11 label7 
+STOREI 3 $T12 
+MULTI $T12 a $T13 
+STOREI $T13 k 
+WRITEI k 
+JUMP label8 
+LABEL label7 
+LABEL label8 
+STOREI 4 $T14 
+NE a $T14 label9 
+STOREI 4 $T15 
+MULTI $T15 a $T16 
+STOREI $T16 u 
+WRITEI u 
+JUMP label10 
+LABEL label9 
+LABEL label10 
+STOREI 20 $T3 
+ADDI a $T3 $T4 
+STOREI $T4 a 
+JUMP label1 
+LABEL label2 
+RET  
