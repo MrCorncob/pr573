@@ -22,9 +22,9 @@ public class Translator {
 //		for(String varName: symTab.symbols.keySet())
 //			System.out.println(varName);
 		
-		Map<String, String> regMap = new HashMap<String, String>();
+		Map<String, String> regMap = new LinkedHashMap<String, String>();
 		Vector v = new Vector(symTab.symbols.keySet());
-		Collections.sort(v);
+//		Collections.sort(v);
 		Iterator it = v.iterator();
 		
 		

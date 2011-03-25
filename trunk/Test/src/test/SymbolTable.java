@@ -1,19 +1,20 @@
 package test;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SymbolTable {
 	public String scopeId;
 	public String currentVarType;
-	Map<String, SymbolTable> symTab = new HashMap<String, SymbolTable>();
+	Map<String, SymbolTable> symTab = new LinkedHashMap<String, SymbolTable>();
+	
 	public SymbolTable getTab(String TabName){
 		return symTab.get(TabName);
 	}
 	public void nestScope(String ScopeId, SymbolTable nestScope){
 		symTab.put(ScopeId, nestScope);
 	}
-	Map<String, Symbol> symbols = new HashMap<String, Symbol>();
+	Map<String, Symbol> symbols = new LinkedHashMap<String, Symbol>();
 	public SymbolTable() {};
 	public SymbolTable(String scopeId){
 		this.scopeId = scopeId;
@@ -27,5 +28,4 @@ public class SymbolTable {
 	public String print(){
 		return scopeId+":"+symbols;
 	}
-
 }
