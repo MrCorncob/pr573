@@ -1,0 +1,29 @@
+LABEL main 
+STOREI 0 $T1 
+STOREI $T1 a 
+STOREI 0 $T2 
+STOREI $T2 b 
+STOREI 0 $T3 
+STOREI $T3 i 
+LABEL label1 
+STOREI 11 $T4 
+GE i $T4 label2 
+READI p 
+STOREI 10 $T7 
+LE p $T7 label3 
+STOREI 1 $T8 
+ADDI a $T8 $T9 
+STOREI $T9 a 
+JUMP label4 
+LABEL label3 
+STOREI 1 $T10 
+ADDI b $T10 $T11 
+STOREI $T11 b 
+LABEL label4 
+STOREI 1 $T5 
+ADDI i $T5 $T6 
+STOREI $T6 i 
+JUMP label1 
+LABEL label2 
+WRITEI a 
+WRITEI b 
