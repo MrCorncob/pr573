@@ -174,7 +174,7 @@ public class CodeGen {
 		link("LABEL " + getChToken(tr, 1));
 		link("LINK ");
 		gen(getCh(tr,2));
-		link("RET");
+		link("RET ");
 //		for(int i=0; i<tr.getChildren().size(); i++){
 //			gen(getCh(tr,i));
 //		}
@@ -277,30 +277,23 @@ public class CodeGen {
 	 * 		2.2 gen() -> stmt done, then jump to end(label[0] + 1 + 1)
 	 * 		2.3 else ->  stmt done, then next is end(label[0] + 1 + 1)
 	 * */
-	private void if_stmt(CommonTree tr) {
-		int[] label = {-1};
-		int label_br = -1;
-		if(tr.getChildren().size() == 2){
+		private void if_stmt(CommonTree tr) {
+			int[] label = {-1};
+			int label_br = -1;
+			
 			cond_gen((CommonTree)tr.getChild(0), label);
-			gen((CommonTree)tr.getChild(1));
-			link("JUMP label" + Integer.toString(label[0]+1));
-			link("LABEL label" + Integer.toString(label[0]));
-			link("LABEL label" + Integer.toString(label[0]+1));
-//		System.out.println("TEST if_stmt 1: " + tr.toString());
-//		System.out.println("TEST if_stmt 2: " + tr.getChildren().toString());
-		}else if(tr.getChildren().size() == 3){
-//			System.out.println("TEST if_stmt 1: " + tr.toString());
-//			System.out.println("TEST if_stmt 2: " + tr.getChildren().toString());
-			cond_gen((CommonTree)tr.getChild(0), label);
-			label_br=label[0];
+			label_br = label[0];
 			label[0]=label_index++;
 			gen((CommonTree)tr.getChild(1));
 			link("JUMP label" + Integer.toString(label_br+1));
 			link("LABEL label" + Integer.toString(label_br));
-			label[0]=label_index++;
-			gen((CommonTree)tr.getChild(2));
+			
+			if(tr.getChildren().size() == 3){
+				label[0]=label_index;
+				gen((CommonTree)tr.getChild(2));
+			}
+			
 			link("LABEL label" + Integer.toString(label_br+1));
-		}
 
 	}
 
