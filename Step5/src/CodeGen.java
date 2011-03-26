@@ -25,7 +25,7 @@ public class CodeGen {
 	void link(String code) {  
 		irList.add(new IrNode(code));
 //		System.out.println("--- IRNode: "+code);
-		System.out.println(code+" ");
+		System.out.println("; "+code+" ");
 
 	}
 
