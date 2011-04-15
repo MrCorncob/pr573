@@ -1,0 +1,138 @@
+str intro "You will be asked for three float numbers\n"
+str first "Please enter the first float number: "
+str second "Please enter the second float number: "
+str third "Please enter the third float number: "
+str eol "\n"
+str star "*"
+str plus "+"
+str equal "="
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+;generating code for function add
+;LABEL add 
+label add
+;LINK  
+link 1
+;ADDF $P1 $P2 $T1 
+move $7 r0
+addr $6 r0
+;STOREF $T1 $L1 
+move r0 $-1
+;STOREF $L1 $R 
+move $-1 r1
+move r1 $8
+;RET 
+unlnk 
+ret 
+;generating code for function multiply
+;LABEL multiply 
+label multiply
+;LINK  
+link 1
+;MULTF $P1 $P2 $T1 
+move $7 r2
+mulr $6 r2
+;STOREF $T1 $L1 
+move r2 $-1
+;STOREF $L1 $R 
+move $-1 r3
+move r3 $8
+;RET 
+unlnk 
+ret 
+;generating code for function main
+;LABEL main 
+label main
+;LINK  
+link 5
+;WRITES intro 
+sys writes intro
+;WRITES first 
+sys writes first
+;READF $L1 
+sys readr $-1
+;WRITES second 
+sys writes second
+;READF $L2 
+sys readr $-2
+;WRITES third 
+sys writes third
+;READF $L3 
+sys readr $-3
+;PUSH 
+push 
+;PUSH $L1 
+push $-1
+;PUSH $L2 
+push $-2
+;JSR multiply 
+push r0
+push r1
+push r2
+push r3
+jsr multiply
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T1 
+pop r4
+;STOREF $T1 $L4 
+move r4 $-4
+;PUSH 
+push 
+;PUSH $L4 
+push $-4
+;PUSH $L3 
+push $-3
+;JSR add 
+push r0
+push r1
+push r2
+push r3
+jsr add
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T2 
+pop r5
+;STOREF $T2 $L5 
+move r5 $-5
+;WRITEF $L1 
+sys writer $-1
+;WRITES star 
+sys writes star
+;WRITEF $L2 
+sys writer $-2
+;WRITES plus 
+sys writes plus
+;WRITEF $L3 
+sys writer $-3
+;WRITES equal 
+sys writes equal
+;WRITEF $L5 
+sys writer $-5
+;WRITES eol 
+sys writes eol
+;STOREI 0 $T3 
+move 0 r6
+;STOREI $T3 $R 
+move r6 $6
+;RET 
+unlnk 
+ret 
+end
