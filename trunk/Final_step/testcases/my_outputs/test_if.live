@@ -1,0 +1,114 @@
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: STOREI 10 $T1 }
+; STOREI 10 $T1 {PRED nodes: LINK  } {SUCC nodes: STOREI $T1 num }
+; STOREI $T1 num {PRED nodes: STOREI 10 $T1 } {SUCC nodes: STOREI 7 $T2 }
+; STOREI 7 $T2 {PRED nodes: STOREI $T1 num } {SUCC nodes: STOREI $T2 num }
+; STOREI $T2 num {PRED nodes: STOREI 7 $T2 } {SUCC nodes: STOREI 2 $T3 }
+; STOREI 2 $T3 {PRED nodes: STOREI $T2 num } {SUCC nodes: STOREI $T3 i }
+; STOREI $T3 i {PRED nodes: STOREI 2 $T3 } {SUCC nodes: STOREI 42 $T4 }
+; STOREI 42 $T4 {PRED nodes: STOREI $T3 i } {SUCC nodes: STOREI $T4 a }
+; STOREI $T4 a {PRED nodes: STOREI 42 $T4 } {SUCC nodes: STOREI 5 $T5 }
+; STOREI 5 $T5 {PRED nodes: STOREI $T4 a } {SUCC nodes: GE i $T5 label1 }
+; GE i $T5 label1 {PRED nodes: STOREI 5 $T5 } {SUCC nodes: LABEL label1  ADDI num a $T6 }
+; ADDI num a $T6 {PRED nodes: GE i $T5 label1 } {SUCC nodes: STOREI $T6 num }
+; STOREI $T6 num {PRED nodes: ADDI num a $T6 } {SUCC nodes: STOREI 3 $T7 }
+; STOREI 3 $T7 {PRED nodes: STOREI $T6 num } {SUCC nodes: GE i $T7 label3 }
+; GE i $T7 label3 {PRED nodes: STOREI 3 $T7 } {SUCC nodes: LABEL label3  ADDI num a $T8 }
+; ADDI num a $T8 {PRED nodes: GE i $T7 label3 } {SUCC nodes: STOREI $T8 num }
+; STOREI $T8 num {PRED nodes: ADDI num a $T8 } {SUCC nodes: JUMP label4 }
+; JUMP label4 {PRED nodes: STOREI $T8 num } {SUCC nodes: LABEL label4 }
+; LABEL label3 {PRED nodes: GE i $T7 label3 } {SUCC nodes: LABEL label4 }
+; LABEL label4 {PRED nodes: JUMP label4  LABEL label3 } {SUCC nodes: JUMP label2 }
+; JUMP label2 {PRED nodes: LABEL label4 } {SUCC nodes: LABEL label2 }
+; LABEL label1 {PRED nodes: GE i $T5 label1 } {SUCC nodes: SUBI num a $T9 }
+; SUBI num a $T9 {PRED nodes: LABEL label1 } {SUCC nodes: STOREI $T9 num }
+; STOREI $T9 num {PRED nodes: SUBI num a $T9 } {SUCC nodes: LABEL label2 }
+; LABEL label2 {PRED nodes: JUMP label2  STOREI $T9 num } {SUCC nodes: WRITEI num }
+; WRITEI num {PRED nodes: LABEL label2 } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI num } {SUCC nodes: RET }
+; RET {PRED nodes: WRITES eol } {SUCC nodes:}
+str eol "\n"
+var i
+var a
+var num
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL main
+label main
+; LINK 
+link 9
+; STOREI 10 $T1
+move 10 r3
+; STOREI $T1 num
+move r3 num
+; STOREI 7 $T2
+move 7 r3
+; STOREI $T2 num
+; STOREI 2 $T3
+move 2 r2
+; STOREI $T3 i
+; STOREI 42 $T4
+move 42 r1
+; STOREI $T4 a
+; STOREI 5 $T5
+move 5 r0
+; GE i $T5 label1
+cmpi r2 r0
+move r0 $-5
+move  r1 a
+move  r2 i
+move  r3 num
+jge label1
+; ADDI num a $T6
+move num r3
+move a r2
+addi r2 r3
+; STOREI $T6 num
+; STOREI 3 $T7
+move 3 r1
+; GE i $T7 label3
+move i r0
+cmpi r0 r1
+move  r0 i
+move r1 $-7
+move  r2 a
+move  r3 num
+jge label3
+; ADDI num a $T8
+move num r3
+move a r2
+addi r2 r3
+; STOREI $T8 num
+; JUMP label4
+move  r3 num
+jmp label4
+; LABEL label3
+label label3
+; LABEL label4
+label label4
+; JUMP label2
+jmp label2
+; LABEL label1
+label label1
+; SUBI num a $T9
+move num r3
+move a r2
+subi r2 r3
+; STOREI $T9 num
+; LABEL label2
+move  r3 num
+label label2
+; WRITEI num
+move num r3
+sys writei r3
+; WRITES eol
+sys writes eol
+; RET
+unlnk
+ret
+end

@@ -1,0 +1,192 @@
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: STOREF 0.0001 $T1 }
+; STOREF 0.0001 $T1 {PRED nodes: LINK  } {SUCC nodes: STOREF $T1 tolerance }
+; STOREF $T1 tolerance {PRED nodes: STOREF 0.0001 $T1 } {SUCC nodes: STOREF 7.0 $T2 }
+; STOREF 7.0 $T2 {PRED nodes: STOREF $T1 tolerance } {SUCC nodes: STOREF $T2 num }
+; STOREF $T2 num {PRED nodes: STOREF 7.0 $T2 } {SUCC nodes: STOREF num approx }
+; STOREF num approx {PRED nodes: STOREF $T2 num } {SUCC nodes: STOREI 0 $T3 }
+; STOREI 0 $T3 {PRED nodes: STOREF num approx } {SUCC nodes: STOREI $T3 count }
+; STOREI $T3 count {PRED nodes: STOREI 0 $T3 } {SUCC nodes: STOREF 0.0 $T4 }
+; STOREF 0.0 $T4 {PRED nodes: STOREI $T3 count } {SUCC nodes: STOREF $T4 diff }
+; STOREF $T4 diff {PRED nodes: STOREF 0.0 $T4 } {SUCC nodes: STOREI 0 $T5 }
+; STOREI 0 $T5 {PRED nodes: STOREF $T4 diff } {SUCC nodes: STOREI $T5 enough }
+; STOREI $T5 enough {PRED nodes: STOREI 0 $T5 } {SUCC nodes: LABEL label1 }
+; LABEL label1 {PRED nodes: JUMP label1  STOREI $T5 enough } {SUCC nodes: STOREI 0 $T6 }
+; STOREI 0 $T6 {PRED nodes: LABEL label1 } {SUCC nodes: NE enough $T6 label2 }
+; NE enough $T6 label2 {PRED nodes: STOREI 0 $T6 } {SUCC nodes: LABEL label2  STOREI 1 $T7 }
+; STOREI 1 $T7 {PRED nodes: NE enough $T6 label2 } {SUCC nodes: ADDI count $T7 $T8 }
+; ADDI count $T7 $T8 {PRED nodes: STOREI 1 $T7 } {SUCC nodes: STOREI $T8 count }
+; STOREI $T8 count {PRED nodes: ADDI count $T7 $T8 } {SUCC nodes: STOREF 0.5 $T9 }
+; STOREF 0.5 $T9 {PRED nodes: STOREI $T8 count } {SUCC nodes: DIVF num approx $T10 }
+; DIVF num approx $T10 {PRED nodes: STOREF 0.5 $T9 } {SUCC nodes: ADDF approx $T10 $T11 }
+; ADDF approx $T10 $T11 {PRED nodes: DIVF num approx $T10 } {SUCC nodes: MULTF $T9 $T11 $T12 }
+; MULTF $T9 $T11 $T12 {PRED nodes: ADDF approx $T10 $T11 } {SUCC nodes: STOREF $T12 newapprox }
+; STOREF $T12 newapprox {PRED nodes: MULTF $T9 $T11 $T12 } {SUCC nodes: SUBF approx newapprox $T13 }
+; SUBF approx newapprox $T13 {PRED nodes: STOREF $T12 newapprox } {SUCC nodes: STOREF $T13 diff }
+; STOREF $T13 diff {PRED nodes: SUBF approx newapprox $T13 } {SUCC nodes: STOREF 0.0 $T14 }
+; STOREF 0.0 $T14 {PRED nodes: STOREF $T13 diff } {SUCC nodes: LE diff $T14 label3 }
+; LE diff $T14 label3 {PRED nodes: STOREF 0.0 $T14 } {SUCC nodes: LABEL label3  GE diff tolerance label5 }
+; GE diff tolerance label5 {PRED nodes: LE diff $T14 label3 } {SUCC nodes: LABEL label5  STOREI 1 $T15 }
+; STOREI 1 $T15 {PRED nodes: GE diff tolerance label5 } {SUCC nodes: STOREI $T15 enough }
+; STOREI $T15 enough {PRED nodes: STOREI 1 $T15 } {SUCC nodes: JUMP label6 }
+; JUMP label6 {PRED nodes: STOREI $T15 enough } {SUCC nodes: LABEL label6 }
+; LABEL label5 {PRED nodes: GE diff tolerance label5 } {SUCC nodes: LABEL label6 }
+; LABEL label6 {PRED nodes: JUMP label6  LABEL label5 } {SUCC nodes: JUMP label4 }
+; JUMP label4 {PRED nodes: LABEL label6 } {SUCC nodes: LABEL label4 }
+; LABEL label3 {PRED nodes: LE diff $T14 label3 } {SUCC nodes: STOREF 0.0 $T16 }
+; STOREF 0.0 $T16 {PRED nodes: LABEL label3 } {SUCC nodes: SUBF $T16 tolerance $T17 }
+; SUBF $T16 tolerance $T17 {PRED nodes: STOREF 0.0 $T16 } {SUCC nodes: LE diff $T17 label7 }
+; LE diff $T17 label7 {PRED nodes: SUBF $T16 tolerance $T17 } {SUCC nodes: LABEL label7  STOREI 1 $T18 }
+; STOREI 1 $T18 {PRED nodes: LE diff $T17 label7 } {SUCC nodes: STOREI $T18 enough }
+; STOREI $T18 enough {PRED nodes: STOREI 1 $T18 } {SUCC nodes: JUMP label8 }
+; JUMP label8 {PRED nodes: STOREI $T18 enough } {SUCC nodes: LABEL label8 }
+; LABEL label7 {PRED nodes: LE diff $T17 label7 } {SUCC nodes: LABEL label8 }
+; LABEL label8 {PRED nodes: JUMP label8  LABEL label7 } {SUCC nodes: LABEL label4 }
+; LABEL label4 {PRED nodes: JUMP label4  LABEL label8 } {SUCC nodes: STOREF newapprox approx }
+; STOREF newapprox approx {PRED nodes: LABEL label4 } {SUCC nodes: JUMP label1 }
+; JUMP label1 {PRED nodes: STOREF newapprox approx } {SUCC nodes: LABEL label1 }
+; LABEL label2 {PRED nodes: NE enough $T6 label2 } {SUCC nodes: WRITEF approx }
+; WRITEF approx {PRED nodes: LABEL label2 } {SUCC nodes: WRITEI count }
+; WRITEI count {PRED nodes: WRITEF approx } {SUCC nodes: RET }
+; RET {PRED nodes: WRITEI count } {SUCC nodes:}
+var count
+var enough
+var newapprox
+var approx
+var num
+var tolerance
+var diff
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL main
+label main
+; LINK 
+link 18
+; STOREF 0.0001 $T1
+move 0.0001 r3
+; STOREF $T1 tolerance
+; STOREF 7.0 $T2
+move 7.0 r2
+; STOREF $T2 num
+; STOREF num approx
+move r2 r1
+; STOREI 0 $T3
+move 0 r0
+; STOREI $T3 count
+; STOREF 0.0 $T4
+move r3 tolerance
+move 0.0 r3
+; STOREF $T4 diff
+move r3 diff
+; STOREI 0 $T5
+move 0 r3
+; STOREI $T5 enough
+; LABEL label1
+move  r0 count
+move  r1 approx
+move  r2 num
+move  r3 enough
+label label1
+; STOREI 0 $T6
+move 0 r3
+; NE enough $T6 label2
+move enough r2
+cmpi r2 r3
+move  r2 enough
+move r3 $-6
+jne label2
+; STOREI 1 $T7
+move 1 r3
+; ADDI count $T7 $T8
+move count r2
+addi r2 r3
+; STOREI $T8 count
+move r3 count
+; STOREF 0.5 $T9
+move 0.5 r3
+; DIVF num approx $T10
+move num r2
+move approx r1
+divr r1 r2
+; ADDF approx $T10 $T11
+addr r1 r2
+; MULTF $T9 $T11 $T12
+mulr r2 r3
+; STOREF $T12 newapprox
+; SUBF approx newapprox $T13
+subr r3 r1
+; STOREF $T13 diff
+move r1 r2
+; STOREF 0.0 $T14
+move 0.0 r1
+; LE diff $T14 label3
+cmpr r2 r1
+move r1 $-14
+move  r2 diff
+move  r3 newapprox
+jle label3
+; GE diff tolerance label5
+move diff r3
+move tolerance r2
+cmpr r3 r2
+move  r2 tolerance
+move  r3 diff
+jge label5
+; STOREI 1 $T15
+move 1 r3
+; STOREI $T15 enough
+move r3 enough
+; JUMP label6
+jmp label6
+; LABEL label5
+label label5
+; LABEL label6
+label label6
+; JUMP label4
+jmp label4
+; LABEL label3
+label label3
+; STOREF 0.0 $T16
+move 0.0 r3
+; SUBF $T16 tolerance $T17
+move tolerance r2
+subr r2 r3
+; LE diff $T17 label7
+move diff r2
+cmpr r2 r3
+move  r2 diff
+move r3 $-17
+jle label7
+; STOREI 1 $T18
+move 1 r3
+; STOREI $T18 enough
+move r3 enough
+; JUMP label8
+jmp label8
+; LABEL label7
+label label7
+; LABEL label8
+label label8
+; LABEL label4
+label label4
+; STOREF newapprox approx
+move r3 approx
+; JUMP label1
+jmp label1
+; LABEL label2
+label label2
+; WRITEF approx
+move approx r3
+sys writer r3
+; WRITEI count
+move count r3
+sys writei r3
+; RET
+unlnk
+ret
+end

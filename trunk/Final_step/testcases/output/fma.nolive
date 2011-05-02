@@ -1,0 +1,288 @@
+;Option: c
+;Option: di
+;Option: reg
+;Printing IRNode's
+;LABEL add 
+;LINK  
+;ADDF $P1 $P2 $T1 
+;STOREF $T1 $L1 
+;STOREF $L1 $R 
+;RET 
+;Printing IRNode's
+;LABEL multiply 
+;LINK  
+;MULTF $P1 $P2 $T1 
+;STOREF $T1 $L1 
+;STOREF $L1 $R 
+;RET 
+;Printing IRNode's
+;LABEL main 
+;LINK  
+;WRITES intro 
+;WRITES first 
+;READF $L1 
+;WRITES second 
+;READF $L2 
+;WRITES third 
+;READF $L3 
+;PUSH 
+;PUSH $L1 
+;PUSH $L2 
+;JSR multiply 
+;POP 
+;POP 
+;POP $T1 
+;STOREF $T1 $L4 
+;PUSH 
+;PUSH $L4 
+;PUSH $L3 
+;JSR add 
+;POP 
+;POP 
+;POP $T2 
+;STOREF $T2 $L5 
+;WRITEF $L1 
+;WRITES star 
+;WRITEF $L2 
+;WRITES plus 
+;WRITEF $L3 
+;WRITES equal 
+;WRITEF $L5 
+;WRITES eol 
+;STOREI 0 $T3 
+;STOREI $T3 $R 
+;RET 
+str intro "You will be asked for three float numbers\n"
+str first "Please enter the first float number: "
+str second "Please enter the second float number: "
+str third "Please enter the third float number: "
+str eol "\n"
+str star "*"
+str plus "+"
+str equal "="
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+;generating code for function add
+;LABEL add 
+;Spilling registers at end of Basic Block
+label add
+;LINK  
+;num local: 1 num temp: 1
+link 2
+;ADDF $P1 $P2 $T1 
+;ensure(): $P1 gets register r3 { r0->null r1->null r2->null r3->$P1 }
+;loading $P1 to register r3
+move $7 r3
+;ensure(): $P2 gets register r2 { r0->null r1->null r2->$P2 r3->$P1 }
+;loading $P2 to register r2
+move $6 r2
+;Switching owner of register r3 to $T1 { r0->null r1->null r2->$P2 r3->$P1 }
+;Spilling variable: $P1
+move r3 $7
+addr r2 r3
+;Freeing unused variable $P2
+;Spilling variable: $P2
+move r2 $6
+;STOREF $T1 $L1 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;STOREF $L1 $R 
+;ensure(): $L1 has register r3 { r0->null r1->null r2->null r3->$L1 }
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+move r3 $8
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;generating code for function multiply
+;LABEL multiply 
+;Spilling registers at end of Basic Block
+label multiply
+;LINK  
+;num local: 1 num temp: 1
+link 2
+;MULTF $P1 $P2 $T1 
+;ensure(): $P1 gets register r3 { r0->null r1->null r2->null r3->$P1 }
+;loading $P1 to register r3
+move $7 r3
+;ensure(): $P2 gets register r2 { r0->null r1->null r2->$P2 r3->$P1 }
+;loading $P2 to register r2
+move $6 r2
+;Switching owner of register r3 to $T1 { r0->null r1->null r2->$P2 r3->$P1 }
+;Spilling variable: $P1
+move r3 $7
+mulr r2 r3
+;Freeing unused variable $P2
+;Spilling variable: $P2
+move r2 $6
+;STOREF $T1 $L1 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;STOREF $L1 $R 
+;ensure(): $L1 has register r3 { r0->null r1->null r2->null r3->$L1 }
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+move r3 $8
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;generating code for function main
+;LABEL main 
+;Spilling registers at end of Basic Block
+label main
+;LINK  
+;num local: 5 num temp: 3
+link 8
+;WRITES intro 
+sys writes intro
+;WRITES first 
+sys writes first
+;READF $L1 
+sys readr $-1
+;WRITES second 
+sys writes second
+;READF $L2 
+sys readr $-2
+;WRITES third 
+sys writes third
+;READF $L3 
+sys readr $-3
+;PUSH 
+push 
+;PUSH $L1 
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;loading $L1 to register r3
+move $-1 r3
+push r3
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+;PUSH $L2 
+;ensure(): $L2 gets register r3 { r0->null r1->null r2->null r3->$L2 }
+;loading $L2 to register r3
+move $-2 r3
+push r3
+;Freeing unused variable $L2
+;Spilling variable: $L2
+move r3 $-2
+;JSR multiply 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr multiply
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T1 
+;ensure(): $T1 gets register r3 { r0->null r1->null r2->null r3->$T1 }
+pop r3
+;STOREF $T1 $L4 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;ensure(): $L4 gets register r3 { r0->null r1->null r2->null r3->$L4 }
+;PUSH 
+push 
+;PUSH $L4 
+;ensure(): $L4 has register r3 { r0->null r1->null r2->null r3->$L4 }
+push r3
+;Freeing unused variable $L4
+;Spilling variable: $L4
+move r3 $-4
+;PUSH $L3 
+;ensure(): $L3 gets register r3 { r0->null r1->null r2->null r3->$L3 }
+;loading $L3 to register r3
+move $-3 r3
+push r3
+;Freeing unused variable $L3
+;Spilling variable: $L3
+move r3 $-3
+;JSR add 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr add
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T2 
+;ensure(): $T2 gets register r3 { r0->null r1->null r2->null r3->$T2 }
+pop r3
+;STOREF $T2 $L5 
+;ensure(): $T2 has register r3 { r0->null r1->null r2->null r3->$T2 }
+;Freeing unused variable $T2
+;ensure(): $L5 gets register r3 { r0->null r1->null r2->null r3->$L5 }
+;WRITEF $L1 
+;ensure(): $L1 gets register r2 { r0->null r1->null r2->$L1 r3->$L5 }
+;loading $L1 to register r2
+move $-1 r2
+sys writer r2
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r2 $-1
+;WRITES star 
+sys writes star
+;WRITEF $L2 
+;ensure(): $L2 gets register r2 { r0->null r1->null r2->$L2 r3->$L5 }
+;loading $L2 to register r2
+move $-2 r2
+sys writer r2
+;Freeing unused variable $L2
+;Spilling variable: $L2
+move r2 $-2
+;WRITES plus 
+sys writes plus
+;WRITEF $L3 
+;ensure(): $L3 gets register r2 { r0->null r1->null r2->$L3 r3->$L5 }
+;loading $L3 to register r2
+move $-3 r2
+sys writer r2
+;Freeing unused variable $L3
+;Spilling variable: $L3
+move r2 $-3
+;WRITES equal 
+sys writes equal
+;WRITEF $L5 
+;ensure(): $L5 has register r3 { r0->null r1->null r2->null r3->$L5 }
+sys writer r3
+;Freeing unused variable $L5
+;Spilling variable: $L5
+move r3 $-5
+;WRITES eol 
+sys writes eol
+;STOREI 0 $T3 
+;ensure(): $T3 gets register r3 { r0->null r1->null r2->null r3->$T3 }
+move 0 r3
+;STOREI $T3 $R 
+;ensure(): $T3 has register r3 { r0->null r1->null r2->null r3->$T3 }
+;Freeing unused variable $T3
+move r3 $6
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+end

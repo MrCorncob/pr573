@@ -1,0 +1,77 @@
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: STOREI 1 $T1 }
+; STOREI 1 $T1 {PRED nodes: LINK  } {SUCC nodes: STOREI $T1 a }
+; STOREI $T1 a {PRED nodes: STOREI 1 $T1 } {SUCC nodes: STOREI 2 $T2 }
+; STOREI 2 $T2 {PRED nodes: STOREI $T1 a } {SUCC nodes: STOREI $T2 b }
+; STOREI $T2 b {PRED nodes: STOREI 2 $T2 } {SUCC nodes: STOREI 10 $T3 }
+; STOREI 10 $T3 {PRED nodes: STOREI $T2 b } {SUCC nodes: STOREI $T3 c }
+; STOREI $T3 c {PRED nodes: STOREI 10 $T3 } {SUCC nodes: WRITEI a }
+; WRITEI a {PRED nodes: STOREI $T3 c } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI a } {SUCC nodes: WRITEI b }
+; WRITEI b {PRED nodes: WRITES eol } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI b } {SUCC nodes: WRITEI c }
+; WRITEI c {PRED nodes: WRITES eol } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI c } {SUCC nodes: READF x }
+; READF x {PRED nodes: WRITES eol } {SUCC nodes: READF y }
+; READF y {PRED nodes: READF x } {SUCC nodes: WRITEF x }
+; WRITEF x {PRED nodes: READF y } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF x } {SUCC nodes: WRITEF y }
+; WRITEF y {PRED nodes: WRITES eol } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF y } {SUCC nodes: RET }
+; RET {PRED nodes: WRITES eol } {SUCC nodes:}
+var a
+var b
+var c
+str eol "\n"
+var x
+var y
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL main
+label main
+; LINK 
+link 3
+; STOREI 1 $T1
+move 1 r3
+; STOREI $T1 a
+; STOREI 2 $T2
+move 2 r2
+; STOREI $T2 b
+; STOREI 10 $T3
+move 10 r1
+; STOREI $T3 c
+; WRITEI a
+sys writei r3
+; WRITES eol
+sys writes eol
+; WRITEI b
+sys writei r2
+; WRITES eol
+sys writes eol
+; WRITEI c
+sys writei r1
+; WRITES eol
+sys writes eol
+; READF x
+move x r3
+sys readr r3
+; READF y
+move y r2
+sys readr r2
+; WRITEF x
+sys writer r3
+; WRITES eol
+sys writes eol
+; WRITEF y
+sys writer r2
+; WRITES eol
+sys writes eol
+; RET
+unlnk
+ret
+end

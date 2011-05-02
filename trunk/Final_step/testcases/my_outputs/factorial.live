@@ -1,0 +1,196 @@
+; LABEL factorial {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL factorial } {SUCC nodes: STOREI 1 $T1 }
+; STOREI 1 $T1 {PRED nodes: LINK  } {SUCC nodes: NE $P1 $T1 label1 }
+; NE $P1 $T1 label1 {PRED nodes: STOREI 1 $T1 } {SUCC nodes: LABEL label1  STOREI 1 $T2 }
+; STOREI 1 $T2 {PRED nodes: NE $P1 $T1 label1 } {SUCC nodes: STOREI $T2 $R }
+; STOREI $T2 $R {PRED nodes: STOREI 1 $T2 } {SUCC nodes: RET }
+; RET {PRED nodes: STOREI $T2 $R } {SUCC nodes:}
+; JUMP label2 {PRED nodes:} {SUCC nodes: LABEL label2 }
+; LABEL label1 {PRED nodes: NE $P1 $T1 label1 } {SUCC nodes: STOREI 1 $T3 }
+; STOREI 1 $T3 {PRED nodes: LABEL label1 } {SUCC nodes: SUBI $P1 $T3 $T4 }
+; SUBI $P1 $T3 $T4 {PRED nodes: STOREI 1 $T3 } {SUCC nodes: PUSH }
+; PUSH {PRED nodes: SUBI $P1 $T3 $T4 } {SUCC nodes: PUSH $T4 }
+; PUSH $T4 {PRED nodes: PUSH } {SUCC nodes: JSR factorial }
+; JSR factorial {PRED nodes: PUSH $T4 } {SUCC nodes: POP }
+; POP {PRED nodes: JSR factorial } {SUCC nodes: POP $T5 }
+; POP $T5 {PRED nodes: POP } {SUCC nodes: MULTI $T5 $P1 $T6 }
+; MULTI $T5 $P1 $T6 {PRED nodes: POP $T5 } {SUCC nodes: STOREI $T6 $L1 }
+; STOREI $T6 $L1 {PRED nodes: MULTI $T5 $P1 $T6 } {SUCC nodes: LABEL label2 }
+; LABEL label2 {PRED nodes: JUMP label2  STOREI $T6 $L1 } {SUCC nodes: STOREI $L1 $R }
+; STOREI $L1 $R {PRED nodes: LABEL label2 } {SUCC nodes: RET }
+; RET {PRED nodes: STOREI $L1 $R } {SUCC nodes:}
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: WRITES input }
+; WRITES input {PRED nodes: LINK  } {SUCC nodes: READI $L1 }
+; READI $L1 {PRED nodes: WRITES input } {SUCC nodes: STOREI 1 $T1 }
+; STOREI 1 $T1 {PRED nodes: READI $L1 } {SUCC nodes: NE $L1 $T1 label3 }
+; NE $L1 $T1 label3 {PRED nodes: STOREI 1 $T1 } {SUCC nodes: LABEL label3  STOREI 1 $T2 }
+; STOREI 1 $T2 {PRED nodes: NE $L1 $T1 label3 } {SUCC nodes: STOREI $T2 $L2 }
+; STOREI $T2 $L2 {PRED nodes: STOREI 1 $T2 } {SUCC nodes: JUMP label4 }
+; JUMP label4 {PRED nodes: STOREI $T2 $L2 } {SUCC nodes: LABEL label4 }
+; LABEL label3 {PRED nodes: NE $L1 $T1 label3 } {SUCC nodes: STOREI 1 $T3 }
+; STOREI 1 $T3 {PRED nodes: LABEL label3 } {SUCC nodes: LE $L1 $T3 label5 }
+; LE $L1 $T3 label5 {PRED nodes: STOREI 1 $T3 } {SUCC nodes: LABEL label5  PUSH }
+; PUSH {PRED nodes: LE $L1 $T3 label5 } {SUCC nodes: PUSH $L1 }
+; PUSH $L1 {PRED nodes: PUSH } {SUCC nodes: JSR factorial }
+; JSR factorial {PRED nodes: PUSH $L1 } {SUCC nodes: POP }
+; POP {PRED nodes: JSR factorial } {SUCC nodes: POP $T4 }
+; POP $T4 {PRED nodes: POP } {SUCC nodes: STOREI $T4 $L2 }
+; STOREI $T4 $L2 {PRED nodes: POP $T4 } {SUCC nodes: JUMP label6 }
+; JUMP label6 {PRED nodes: STOREI $T4 $L2 } {SUCC nodes: LABEL label6 }
+; LABEL label5 {PRED nodes: LE $L1 $T3 label5 } {SUCC nodes: STOREI 0 $T5 }
+; STOREI 0 $T5 {PRED nodes: LABEL label5 } {SUCC nodes: STOREI $T5 $L2 }
+; STOREI $T5 $L2 {PRED nodes: STOREI 0 $T5 } {SUCC nodes: LABEL label6 }
+; LABEL label6 {PRED nodes: JUMP label6  STOREI $T5 $L2 } {SUCC nodes: LABEL label4 }
+; LABEL label4 {PRED nodes: JUMP label4  LABEL label6 } {SUCC nodes: WRITEI $L2 }
+; WRITEI $L2 {PRED nodes: LABEL label4 } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI $L2 } {SUCC nodes: STOREI 0 $T6 }
+; STOREI 0 $T6 {PRED nodes: WRITES eol } {SUCC nodes: STOREI $T6 $R }
+; STOREI $T6 $R {PRED nodes: STOREI 0 $T6 } {SUCC nodes: RET }
+; RET {PRED nodes: STOREI $T6 $R } {SUCC nodes:}
+str input "Please enter an integer number: "
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL factorial
+label factorial
+; LINK 
+link 7
+; STOREI 1 $T1
+move 1 r3
+; NE $P1 $T1 label1
+move $6 r2
+cmpi r2 r3
+move r2 $6
+move r3 $-2
+jne label1
+; STOREI 1 $T2
+move 1 r3
+; STOREI $T2 $R
+move r3 $7
+; RET
+unlnk
+ret
+; JUMP label2
+jmp label2
+; LABEL label1
+label label1
+; STOREI 1 $T3
+move 1 r3
+; SUBI $P1 $T3 $T4
+move $6 r2
+move r2 $6
+subi r3 r2
+; PUSH
+push
+; PUSH $T4
+push r2
+; JSR factorial
+push r0
+push r1
+push r2
+push r3
+jsr factorial
+pop r3
+pop r2
+pop r1
+pop r0
+; POP
+pop
+; POP $T5
+pop r3
+; MULTI $T5 $P1 $T6
+move $6 r2
+muli r2 r3
+; STOREI $T6 $L1
+; LABEL label2
+move r3 $-1
+label label2
+; STOREI $L1 $R
+move r3 $7
+; RET
+unlnk
+ret
+; LABEL main
+label main
+; LINK 
+link 8
+; WRITES input
+sys writes input
+; READI $L1
+sys readi $-1
+; STOREI 1 $T1
+move 1 r3
+; NE $L1 $T1 label3
+move $-1 r2
+cmpi r2 r3
+move r2 $-1
+move r3 $-3
+jne label3
+; STOREI 1 $T2
+move 1 r3
+; STOREI $T2 $L2
+; JUMP label4
+move r3 $-2
+jmp label4
+; LABEL label3
+label label3
+; STOREI 1 $T3
+move 1 r3
+; LE $L1 $T3 label5
+move $-1 r2
+cmpi r2 r3
+move r2 $-1
+move r3 $-5
+jle label5
+; PUSH
+push
+; PUSH $L1
+move $-1 r3
+push r3
+; JSR factorial
+push r0
+push r1
+push r2
+push r3
+jsr factorial
+pop r3
+pop r2
+pop r1
+pop r0
+; POP
+pop
+; POP $T4
+pop r3
+; STOREI $T4 $L2
+; JUMP label6
+move r3 $-2
+jmp label6
+; LABEL label5
+label label5
+; STOREI 0 $T5
+move 0 r3
+; STOREI $T5 $L2
+; LABEL label6
+move r3 $-2
+label label6
+; LABEL label4
+label label4
+; WRITEI $L2
+move $-2 r3
+sys writei r3
+; WRITES eol
+sys writes eol
+; STOREI 0 $T6
+move 0 r3
+; STOREI $T6 $R
+move r3 $6
+; RET
+unlnk
+ret
+end
