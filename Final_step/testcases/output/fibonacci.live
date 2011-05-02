@@ -1,0 +1,343 @@
+;Option: -live
+str input "Please input an integer number: "
+str space " "
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+;generating code for function f
+;LABEL f 
+;Spilling registers at end of Basic Block
+label f
+;LINK  
+;num local: 0 num temp: 13
+link 13
+;STOREI 2 $T1 
+;ensure(): $T1 gets register r3 { r0->null r1->null r2->null r3->$T1 }
+move 2 r3
+;LE $P1 $T1 label1 
+;ensure(): $P1 gets register r2 { r0->null r1->null r2->$P1 r3->$T1 }
+;loading $P1 to register r2
+move $6 r2
+;ensure(): $T1 has register r3 { r0->null r1->null r2->$P1 r3->$T1 }
+cmpi r2 r3
+;Spilling registers at end of Basic Block
+;Freeing unused variable $P1
+;Spilling variable: $P1
+move r2 $6
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after LE $P1 $T1 label1  liveout {$P1 input space eol }
+jle label1
+;STOREI 1 $T2 
+;ensure(): $T2 gets register r3 { r0->null r1->null r2->null r3->$T2 }
+move 1 r3
+;SUBI $P1 $T2 $T3 
+;ensure(): $P1 gets register r2 { r0->null r1->null r2->$P1 r3->$T2 }
+;loading $P1 to register r2
+move $6 r2
+;ensure(): $T2 has register r3 { r0->null r1->null r2->$P1 r3->$T2 }
+;Switching owner of register r2 to $T3 { r0->null r1->null r2->$P1 r3->$T2 }
+;Spilling variable: $P1
+move r2 $6
+subi r3 r2
+;Freeing unused variable $T2
+;Spilling is removed: variable $T2 is dead after SUBI $P1 $T2 $T3  liveout {$P1 $T3 input space eol }
+;PUSH 
+push 
+;PUSH $T3 
+;ensure(): $T3 has register r2 { r0->null r1->null r2->$T3 r3->null }
+push r2
+;Freeing unused variable $T3
+;Spilling is removed: variable $T3 is dead after PUSH $T3  liveout {$P1 input space eol }
+;JSR f 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr f
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP $T4 
+;ensure(): $T4 gets register r3 { r0->null r1->null r2->null r3->$T4 }
+pop r3
+;Freeing unused variable $T4
+;Spilling temp: $T4
+move r3 $-4
+;STOREI 2 $T5 
+;ensure(): $T5 gets register r3 { r0->null r1->null r2->null r3->$T5 }
+move 2 r3
+;SUBI $P1 $T5 $T6 
+;ensure(): $P1 gets register r2 { r0->null r1->null r2->$P1 r3->$T5 }
+;loading $P1 to register r2
+move $6 r2
+;ensure(): $T5 has register r3 { r0->null r1->null r2->$P1 r3->$T5 }
+;Switching owner of register r2 to $T6 { r0->null r1->null r2->$P1 r3->$T5 }
+;Spilling is removed: variable $P1 is dead after SUBI $P1 $T5 $T6  liveout {$T4 input space eol $T6 }
+subi r3 r2
+;Freeing unused variable $T5
+;Spilling is removed: variable $T5 is dead after SUBI $P1 $T5 $T6  liveout {$T4 input space eol $T6 }
+;PUSH 
+push 
+;PUSH $T6 
+;ensure(): $T6 has register r2 { r0->null r1->null r2->$T6 r3->null }
+push r2
+;Freeing unused variable $T6
+;Spilling is removed: variable $T6 is dead after PUSH $T6  liveout {$T4 input space eol }
+;JSR f 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr f
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP $T7 
+;ensure(): $T7 gets register r3 { r0->null r1->null r2->null r3->$T7 }
+pop r3
+;ADDI $T4 $T7 $T8 
+;ensure(): $T4 gets register r2 { r0->null r1->null r2->$T4 r3->$T7 }
+;loading $T4 to register r2
+move $-4 r2
+;ensure(): $T7 has register r3 { r0->null r1->null r2->$T4 r3->$T7 }
+;Switching owner of register r2 to $T8 { r0->null r1->null r2->$T4 r3->$T7 }
+;Spilling is removed: variable $T4 is dead after ADDI $T4 $T7 $T8  liveout {$T8 }
+addi r3 r2
+;Freeing unused variable $T7
+;Spilling is removed: variable $T7 is dead after ADDI $T4 $T7 $T8  liveout {$T8 }
+;STOREI $T8 $R 
+;ensure(): $T8 has register r2 { r0->null r1->null r2->$T8 r3->null }
+;Freeing unused variable $T8
+;Spilling is removed: variable $T8 is dead after STOREI $T8 $R  liveout {$R }
+move r2 $7
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;JUMP label2 
+;Spilling registers at end of Basic Block
+jmp label2
+;LABEL label1 
+;Spilling registers at end of Basic Block
+label label1
+;STOREI 0 $T9 
+;ensure(): $T9 gets register r3 { r0->null r1->null r2->null r3->$T9 }
+move 0 r3
+;NE $P1 $T9 label3 
+;ensure(): $P1 gets register r2 { r0->null r1->null r2->$P1 r3->$T9 }
+;loading $P1 to register r2
+move $6 r2
+;ensure(): $T9 has register r3 { r0->null r1->null r2->$P1 r3->$T9 }
+cmpi r2 r3
+;Spilling registers at end of Basic Block
+;Freeing unused variable $P1
+;Spilling variable: $P1
+move r2 $6
+;Freeing unused variable $T9
+;Spilling is removed: variable $T9 is dead after NE $P1 $T9 label3  liveout {$P1 }
+jne label3
+;STOREI 0 $T10 
+;ensure(): $T10 gets register r3 { r0->null r1->null r2->null r3->$T10 }
+move 0 r3
+;STOREI $T10 $R 
+;ensure(): $T10 has register r3 { r0->null r1->null r2->null r3->$T10 }
+;Freeing unused variable $T10
+;Spilling is removed: variable $T10 is dead after STOREI $T10 $R  liveout {$R }
+move r3 $7
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;JUMP label4 
+;Spilling registers at end of Basic Block
+jmp label4
+;LABEL label3 
+;Spilling registers at end of Basic Block
+label label3
+;STOREI 1 $T11 
+;ensure(): $T11 gets register r3 { r0->null r1->null r2->null r3->$T11 }
+move 1 r3
+;NE $P1 $T11 label5 
+;ensure(): $P1 gets register r2 { r0->null r1->null r2->$P1 r3->$T11 }
+;loading $P1 to register r2
+move $6 r2
+;ensure(): $T11 has register r3 { r0->null r1->null r2->$P1 r3->$T11 }
+cmpi r2 r3
+;Spilling registers at end of Basic Block
+;Freeing unused variable $P1
+;Spilling is removed: variable $P1 is dead after NE $P1 $T11 label5  liveout {}
+;Freeing unused variable $T11
+;Spilling is removed: variable $T11 is dead after NE $P1 $T11 label5  liveout {}
+jne label5
+;STOREI 1 $T12 
+;ensure(): $T12 gets register r3 { r0->null r1->null r2->null r3->$T12 }
+move 1 r3
+;STOREI $T12 $R 
+;ensure(): $T12 has register r3 { r0->null r1->null r2->null r3->$T12 }
+;Freeing unused variable $T12
+;Spilling is removed: variable $T12 is dead after STOREI $T12 $R  liveout {$R }
+move r3 $7
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;JUMP label6 
+;Spilling registers at end of Basic Block
+jmp label6
+;LABEL label5 
+;Spilling registers at end of Basic Block
+label label5
+;STOREI 1 $T13 
+;ensure(): $T13 gets register r3 { r0->null r1->null r2->null r3->$T13 }
+move 1 r3
+;STOREI $T13 $R 
+;ensure(): $T13 has register r3 { r0->null r1->null r2->null r3->$T13 }
+;Freeing unused variable $T13
+;Spilling is removed: variable $T13 is dead after STOREI $T13 $R  liveout {$R }
+move r3 $7
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;LABEL label6 
+;Spilling registers at end of Basic Block
+label label6
+;LABEL label4 
+;Spilling registers at end of Basic Block
+label label4
+;LABEL label2 
+;Spilling registers at end of Basic Block
+label label2
+;RET  
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;generating code for function main
+;LABEL main 
+;Spilling registers at end of Basic Block
+label main
+;LINK  
+;num local: 3 num temp: 4
+link 7
+;WRITES input 
+sys writes input
+;READI $L2 
+sys readi $-2
+;STOREI 0 $T1 
+;ensure(): $T1 gets register r3 { r0->null r1->null r2->null r3->$T1 }
+move 0 r3
+;STOREI $T1 $L1 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after STOREI $T1 $L1  liveout {$L1 $L2 $R space input eol }
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+;LABEL label7 
+;Spilling registers at end of Basic Block
+label label7
+;GE $L1 $L2 label8 
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;loading $L1 to register r3
+move $-1 r3
+;ensure(): $L2 gets register r2 { r0->null r1->null r2->$L2 r3->$L1 }
+;loading $L2 to register r2
+move $-2 r2
+cmpi r3 r2
+;Spilling registers at end of Basic Block
+;Freeing unused variable $L2
+;Spilling variable: $L2
+move r2 $-2
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+jge label8
+;PUSH 
+push 
+;PUSH $L1 
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;loading $L1 to register r3
+move $-1 r3
+push r3
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+;JSR f 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr f
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP $T4 
+;ensure(): $T4 gets register r3 { r0->null r1->null r2->null r3->$T4 }
+pop r3
+;STOREI $T4 $L3 
+;ensure(): $T4 has register r3 { r0->null r1->null r2->null r3->$T4 }
+;Freeing unused variable $T4
+;Spilling is removed: variable $T4 is dead after STOREI $T4 $L3  liveout {$L1 $L2 $R space input $L3 eol }
+;ensure(): $L3 gets register r3 { r0->null r1->null r2->null r3->$L3 }
+;WRITEI $L1 
+;ensure(): $L1 gets register r2 { r0->null r1->null r2->$L1 r3->$L3 }
+;loading $L1 to register r2
+move $-1 r2
+sys writei r2
+;WRITES space 
+sys writes space
+;WRITEI $L3 
+;ensure(): $L3 has register r3 { r0->null r1->null r2->$L1 r3->$L3 }
+sys writei r3
+;Freeing unused variable $L3
+;Spilling is removed: variable $L3 is dead after WRITEI $L3  liveout {$L1 $L2 $R space input eol }
+;WRITES eol 
+sys writes eol
+;STOREI 1 $T2 
+;ensure(): $T2 gets register r3 { r0->null r1->null r2->$L1 r3->$T2 }
+move 1 r3
+;ADDI $L1 $T2 $T3 
+;ensure(): $L1 has register r2 { r0->null r1->null r2->$L1 r3->$T2 }
+;ensure(): $T2 has register r3 { r0->null r1->null r2->$L1 r3->$T2 }
+;Switching owner of register r2 to $T3 { r0->null r1->null r2->$L1 r3->$T2 }
+;Spilling is removed: variable $L1 is dead after ADDI $L1 $T2 $T3  liveout {$L2 $R space input $T3 eol }
+addi r3 r2
+;Freeing unused variable $T2
+;Spilling is removed: variable $T2 is dead after ADDI $L1 $T2 $T3  liveout {$L2 $R space input $T3 eol }
+;STOREI $T3 $L1 
+;ensure(): $T3 has register r2 { r0->null r1->null r2->$T3 r3->null }
+;Freeing unused variable $T3
+;Spilling is removed: variable $T3 is dead after STOREI $T3 $L1  liveout {$L1 $L2 $R space input eol }
+;ensure(): $L1 gets register r2 { r0->null r1->null r2->$L1 r3->null }
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r2 $-1
+;JUMP label7 
+;Spilling registers at end of Basic Block
+jmp label7
+;LABEL label8 
+;Spilling registers at end of Basic Block
+label label8
+;RET  
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+end

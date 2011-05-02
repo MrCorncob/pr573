@@ -1,0 +1,118 @@
+; LABEL printf {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL printf } {SUCC nodes: WRITEF $P1 }
+; WRITEF $P1 {PRED nodes: LINK  } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF $P1 } {SUCC nodes: WRITEF $P3 }
+; WRITEF $P3 {PRED nodes: WRITES eol } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF $P3 } {SUCC nodes: STOREF $P2 $L1 }
+; STOREF $P2 $L1 {PRED nodes: WRITES eol } {SUCC nodes: STOREF $L1 $R }
+; STOREF $L1 $R {PRED nodes: STOREF $P2 $L1 } {SUCC nodes: RET }
+; RET {PRED nodes: STOREF $L1 $R } {SUCC nodes:}
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: STOREF 4.4 $T1 }
+; STOREF 4.4 $T1 {PRED nodes: LINK  } {SUCC nodes: STOREF $T1 $L1 }
+; STOREF $T1 $L1 {PRED nodes: STOREF 4.4 $T1 } {SUCC nodes: STOREF 5.5 $T2 }
+; STOREF 5.5 $T2 {PRED nodes: STOREF $T1 $L1 } {SUCC nodes: STOREF $T2 $L2 }
+; STOREF $T2 $L2 {PRED nodes: STOREF 5.5 $T2 } {SUCC nodes: STOREF 6.6 $T3 }
+; STOREF 6.6 $T3 {PRED nodes: STOREF $T2 $L2 } {SUCC nodes: STOREF $T3 $L3 }
+; STOREF $T3 $L3 {PRED nodes: STOREF 6.6 $T3 } {SUCC nodes: PUSH }
+; PUSH {PRED nodes: STOREF $T3 $L3 } {SUCC nodes: PUSH $L1 }
+; PUSH $L1 {PRED nodes: PUSH } {SUCC nodes: PUSH $L2 }
+; PUSH $L2 {PRED nodes: PUSH $L1 } {SUCC nodes: PUSH $L3 }
+; PUSH $L3 {PRED nodes: PUSH $L2 } {SUCC nodes: JSR printf }
+; JSR printf {PRED nodes: PUSH $L3 } {SUCC nodes: POP }
+; POP {PRED nodes: JSR printf } {SUCC nodes: POP }
+; POP {PRED nodes: POP } {SUCC nodes: POP }
+; POP {PRED nodes: POP } {SUCC nodes: POP $T4 }
+; POP $T4 {PRED nodes: POP } {SUCC nodes: STOREF $T4 $L4 }
+; STOREF $T4 $L4 {PRED nodes: POP $T4 } {SUCC nodes: WRITEF $L4 }
+; WRITEF $L4 {PRED nodes: STOREF $T4 $L4 } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF $L4 } {SUCC nodes: STOREI 0 $T5 }
+; STOREI 0 $T5 {PRED nodes: WRITES eol } {SUCC nodes: STOREI $T5 $R }
+; STOREI $T5 $R {PRED nodes: STOREI 0 $T5 } {SUCC nodes: RET }
+; RET {PRED nodes: STOREI $T5 $R } {SUCC nodes:}
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL printf
+label printf
+; LINK 
+link 1
+; WRITEF $P1
+move $8 r3
+sys writer r3
+; WRITES eol
+sys writes eol
+; WRITEF $P3
+move $6 r3
+sys writer r3
+; WRITES eol
+sys writes eol
+; STOREF $P2 $L1
+; STOREF $L1 $R
+move r3 $9
+; RET
+unlnk
+ret
+; LABEL main
+label main
+; LINK 
+link 9
+; STOREF 4.4 $T1
+move 4.4 r3
+; STOREF $T1 $L1
+move r3 $-1
+; STOREF 5.5 $T2
+move 5.5 r3
+; STOREF $T2 $L2
+move r3 $-2
+; STOREF 6.6 $T3
+move 6.6 r3
+; STOREF $T3 $L3
+move r3 $-3
+; PUSH
+push
+; PUSH $L1
+move $-1 r3
+push r3
+; PUSH $L2
+move $-2 r3
+push r3
+; PUSH $L3
+move $-3 r3
+push r3
+; JSR printf
+push r0
+push r1
+push r2
+push r3
+jsr printf
+pop r3
+pop r2
+pop r1
+pop r0
+; POP
+pop
+; POP
+pop
+; POP
+pop
+; POP $T4
+pop r3
+; STOREF $T4 $L4
+; WRITEF $L4
+sys writer r3
+; WRITES eol
+sys writes eol
+; STOREI 0 $T5
+move 0 r3
+; STOREI $T5 $R
+move r3 $6
+; RET
+unlnk
+ret
+end

@@ -1,0 +1,195 @@
+; LABEL main {PRED nodes:} {SUCC nodes: LINK  }
+; LINK  {PRED nodes: LABEL main } {SUCC nodes: STOREI 1 $T1 }
+; STOREI 1 $T1 {PRED nodes: LINK  } {SUCC nodes: STOREI $T1 a }
+; STOREI $T1 a {PRED nodes: STOREI 1 $T1 } {SUCC nodes: STOREI 2 $T2 }
+; STOREI 2 $T2 {PRED nodes: STOREI $T1 a } {SUCC nodes: STOREI $T2 b }
+; STOREI $T2 b {PRED nodes: STOREI 2 $T2 } {SUCC nodes: STOREI 10 $T3 }
+; STOREI 10 $T3 {PRED nodes: STOREI $T2 b } {SUCC nodes: STOREI $T3 c }
+; STOREI $T3 c {PRED nodes: STOREI 10 $T3 } {SUCC nodes: STOREI 20 $T4 }
+; STOREI 20 $T4 {PRED nodes: STOREI $T3 c } {SUCC nodes: STOREI $T4 d }
+; STOREI $T4 d {PRED nodes: STOREI 20 $T4 } {SUCC nodes: ADDI a b $T5 }
+; ADDI a b $T5 {PRED nodes: STOREI $T4 d } {SUCC nodes: STOREI $T5 a }
+; STOREI $T5 a {PRED nodes: ADDI a b $T5 } {SUCC nodes: WRITEI a }
+; WRITEI a {PRED nodes: STOREI $T5 a } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI a } {SUCC nodes: MULTI a c $T6 }
+; MULTI a c $T6 {PRED nodes: WRITES eol } {SUCC nodes: STOREI $T6 b }
+; STOREI $T6 b {PRED nodes: MULTI a c $T6 } {SUCC nodes: WRITEI b }
+; WRITEI b {PRED nodes: STOREI $T6 b } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI b } {SUCC nodes: STOREI 0 $T7 }
+; STOREI 0 $T7 {PRED nodes: WRITES eol } {SUCC nodes: SUBI $T7 a $T8 }
+; SUBI $T7 a $T8 {PRED nodes: STOREI 0 $T7 } {SUCC nodes: ADDI $T8 b $T9 }
+; ADDI $T8 b $T9 {PRED nodes: SUBI $T7 a $T8 } {SUCC nodes: STOREI $T9 c }
+; STOREI $T9 c {PRED nodes: ADDI $T8 b $T9 } {SUCC nodes: WRITEI c }
+; WRITEI c {PRED nodes: STOREI $T9 c } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI c } {SUCC nodes: STOREI 0 $T10 }
+; STOREI 0 $T10 {PRED nodes: WRITES eol } {SUCC nodes: SUBI $T10 d $T11 }
+; SUBI $T10 d $T11 {PRED nodes: STOREI 0 $T10 } {SUCC nodes: STOREI $T11 d }
+; STOREI $T11 d {PRED nodes: SUBI $T10 d $T11 } {SUCC nodes: WRITEI d }
+; WRITEI d {PRED nodes: STOREI $T11 d } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI d } {SUCC nodes: STOREI 10 $T12 }
+; STOREI 10 $T12 {PRED nodes: WRITES eol } {SUCC nodes: ADDI a $T12 $T13 }
+; ADDI a $T12 $T13 {PRED nodes: STOREI 10 $T12 } {SUCC nodes: STOREI $T13 a }
+; STOREI $T13 a {PRED nodes: ADDI a $T12 $T13 } {SUCC nodes: WRITEI a }
+; WRITEI a {PRED nodes: STOREI $T13 a } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI a } {SUCC nodes: ADDI b a $T14 }
+; ADDI b a $T14 {PRED nodes: WRITES eol } {SUCC nodes: STOREI 10 $T15 }
+; STOREI 10 $T15 {PRED nodes: ADDI b a $T14 } {SUCC nodes: ADDI $T14 $T15 $T16 }
+; ADDI $T14 $T15 $T16 {PRED nodes: STOREI 10 $T15 } {SUCC nodes: STOREI $T16 b }
+; STOREI $T16 b {PRED nodes: ADDI $T14 $T15 $T16 } {SUCC nodes: WRITEI b }
+; WRITEI b {PRED nodes: STOREI $T16 b } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI b } {SUCC nodes: STOREI 0 $T17 }
+; STOREI 0 $T17 {PRED nodes: WRITES eol } {SUCC nodes: STOREI 10 $T18 }
+; STOREI 10 $T18 {PRED nodes: STOREI 0 $T17 } {SUCC nodes: SUBI $T17 $T18 $T19 }
+; SUBI $T17 $T18 $T19 {PRED nodes: STOREI 10 $T18 } {SUCC nodes: STOREI $T19 c }
+; STOREI $T19 c {PRED nodes: SUBI $T17 $T18 $T19 } {SUCC nodes: WRITEI c }
+; WRITEI c {PRED nodes: STOREI $T19 c } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEI c } {SUCC nodes: STOREF 1.0 $T20 }
+; STOREF 1.0 $T20 {PRED nodes: WRITES eol } {SUCC nodes: STOREF $T20 x }
+; STOREF $T20 x {PRED nodes: STOREF 1.0 $T20 } {SUCC nodes: STOREF 2.0 $T21 }
+; STOREF 2.0 $T21 {PRED nodes: STOREF $T20 x } {SUCC nodes: STOREF $T21 y }
+; STOREF $T21 y {PRED nodes: STOREF 2.0 $T21 } {SUCC nodes: STOREF 3.14159 $T22 }
+; STOREF 3.14159 $T22 {PRED nodes: STOREF $T21 y } {SUCC nodes: STOREF $T22 z }
+; STOREF $T22 z {PRED nodes: STOREF 3.14159 $T22 } {SUCC nodes: STOREF 2.0 $T23 }
+; STOREF 2.0 $T23 {PRED nodes: STOREF $T22 z } {SUCC nodes: ADDF z $T23 $T24 }
+; ADDF z $T23 $T24 {PRED nodes: STOREF 2.0 $T23 } {SUCC nodes: SUBF $T24 x $T25 }
+; SUBF $T24 x $T25 {PRED nodes: ADDF z $T23 $T24 } {SUCC nodes: STOREF $T25 x }
+; STOREF $T25 x {PRED nodes: SUBF $T24 x $T25 } {SUCC nodes: DIVF z y $T26 }
+; DIVF z y $T26 {PRED nodes: STOREF $T25 x } {SUCC nodes: STOREF $T26 y }
+; STOREF $T26 y {PRED nodes: DIVF z y $T26 } {SUCC nodes: WRITEF x }
+; WRITEF x {PRED nodes: STOREF $T26 y } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF x } {SUCC nodes: WRITEF y }
+; WRITEF y {PRED nodes: WRITES eol } {SUCC nodes: WRITES eol }
+; WRITES eol {PRED nodes: WRITEF y } {SUCC nodes: RET }
+; RET {PRED nodes: WRITES eol } {SUCC nodes:}
+str eol "\n"
+var a
+var b
+var c
+var d
+var x
+var y
+var z
+var t
+str tab "\t"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+; LABEL main
+label main
+; LINK 
+link 26
+; STOREI 1 $T1
+move 1 r3
+; STOREI $T1 a
+; STOREI 2 $T2
+move 2 r2
+; STOREI $T2 b
+; STOREI 10 $T3
+move 10 r1
+; STOREI $T3 c
+; STOREI 20 $T4
+move 20 r0
+; STOREI $T4 d
+; ADDI a b $T5
+addi r2 r3
+; STOREI $T5 a
+; WRITEI a
+sys writei r3
+; WRITES eol
+sys writes eol
+; MULTI a c $T6
+move r3 r2
+muli r1 r2
+; STOREI $T6 b
+; WRITEI b
+sys writei r2
+; WRITES eol
+sys writes eol
+; STOREI 0 $T7
+move 0 r1
+; SUBI $T7 a $T8
+subi r3 r1
+; ADDI $T8 b $T9
+addi r2 r1
+; STOREI $T9 c
+; WRITEI c
+sys writei r1
+; WRITES eol
+sys writes eol
+; STOREI 0 $T10
+move 0 r1
+; SUBI $T10 d $T11
+subi r0 r1
+; STOREI $T11 d
+; WRITEI d
+sys writei r1
+; WRITES eol
+sys writes eol
+; STOREI 10 $T12
+move 10 r1
+; ADDI a $T12 $T13
+addi r1 r3
+; STOREI $T13 a
+; WRITEI a
+sys writei r3
+; WRITES eol
+sys writes eol
+; ADDI b a $T14
+addi r2 r3
+; STOREI 10 $T15
+move 10 r2
+; ADDI $T14 $T15 $T16
+addi r2 r3
+; STOREI $T16 b
+; WRITEI b
+sys writei r3
+; WRITES eol
+sys writes eol
+; STOREI 0 $T17
+move 0 r3
+; STOREI 10 $T18
+move 10 r2
+; SUBI $T17 $T18 $T19
+subi r2 r3
+; STOREI $T19 c
+; WRITEI c
+sys writei r3
+; WRITES eol
+sys writes eol
+; STOREF 1.0 $T20
+move 1.0 r3
+; STOREF $T20 x
+; STOREF 2.0 $T21
+move 2.0 r2
+; STOREF $T21 y
+; STOREF 3.14159 $T22
+move 3.14159 r1
+; STOREF $T22 z
+; STOREF 2.0 $T23
+move 2.0 r0
+; ADDF z $T23 $T24
+addr r1 r0
+; SUBF $T24 x $T25
+subr r3 r0
+; STOREF $T25 x
+move r0 r3
+; DIVF z y $T26
+divr r2 r1
+; STOREF $T26 y
+move r1 r2
+; WRITEF x
+sys writer r3
+; WRITES eol
+sys writes eol
+; WRITEF y
+sys writer r2
+; WRITES eol
+sys writes eol
+; RET
+unlnk
+ret
+end

@@ -1,0 +1,76 @@
+; LABEL main 
+; LINK  
+; STOREI 10 $T1 
+; STOREI $T1 num 
+; STOREI 7 $T2 
+; STOREI $T2 num 
+; STOREI 2 $T3 
+; STOREI $T3 i 
+; STOREI 42 $T4 
+; STOREI $T4 a 
+; STOREI 5 $T5 
+; GE i $T5 label1 
+; ADDI num a $T6 
+; STOREI $T6 num 
+; STOREI 3 $T7 
+; GE i $T7 label3 
+; ADDI num a $T8 
+; STOREI $T8 num 
+; JUMP label4 
+; LABEL label3 
+; LABEL label4 
+; JUMP label2 
+; LABEL label1 
+; SUBI num a $T9 
+; STOREI $T9 num 
+; LABEL label2 
+; WRITEI num 
+; WRITES eol 
+; RET 
+str eol "\n"
+var i
+var a
+var num
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label main
+link 0
+move 10 r0
+move r0 num
+move 7 r1
+move r1 num
+move 2 r2
+move r2 i
+move 42 r3
+move r3 a
+move 5 r4
+cmpi i r4
+jge label1
+move num r5
+addi a r5
+move r5 num
+move 3 r6
+cmpi i r6
+jge label3
+move num r7
+addi a r7
+move r7 num
+jmp label4
+label label3
+label label4
+jmp label2
+label label1
+move num r8
+subi a r8
+move r8 num
+label label2
+sys writei num
+sys writes eol
+unlnk
+ret
+end

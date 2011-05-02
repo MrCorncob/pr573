@@ -1,0 +1,57 @@
+; LABEL main 
+; LINK  
+; STOREI 1 $T1 
+; STOREI $T1 a 
+; STOREI 2 $T2 
+; STOREI $T2 b 
+; STOREI 10 $T3 
+; STOREI $T3 c 
+; WRITEI a 
+; WRITES eol 
+; WRITEI b 
+; WRITES eol 
+; WRITEI c 
+; WRITES eol 
+; READF x 
+; READF y 
+; WRITEF x 
+; WRITES eol 
+; WRITEF y 
+; WRITES eol 
+; RET 
+var a
+var b
+var c
+str eol "\n"
+var x
+var y
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label main
+link 0
+move 1 r0
+move r0 a
+move 2 r1
+move r1 b
+move 10 r2
+move r2 c
+sys writei a
+sys writes eol
+sys writei b
+sys writes eol
+sys writei c
+sys writes eol
+sys readr x
+sys readr y
+sys writer x
+sys writes eol
+sys writer y
+sys writes eol
+unlnk
+ret
+end

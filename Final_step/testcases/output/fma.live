@@ -1,0 +1,283 @@
+;Option: c
+;Option: df
+;Option: reg
+;Option: live
+;Printing IRNode's
+;LABEL add 		{PRED nodes:}		{SUCC nodes: LINK  }
+;LINK  		{PRED nodes: LABEL add }		{SUCC nodes: ADDF $P1 $P2 $T1 }
+;ADDF $P1 $P2 $T1 		{PRED nodes: LINK  }		{SUCC nodes: STOREF $T1 $L1 }
+;STOREF $T1 $L1 		{PRED nodes: ADDF $P1 $P2 $T1 }		{SUCC nodes: STOREF $L1 $R }
+;STOREF $L1 $R 		{PRED nodes: STOREF $T1 $L1 }		{SUCC nodes: RET }
+;RET 		{PRED nodes: STOREF $L1 $R }		{SUCC nodes:}
+;Printing IRNode's
+;LABEL multiply 		{PRED nodes:}		{SUCC nodes: LINK  }
+;LINK  		{PRED nodes: LABEL multiply }		{SUCC nodes: MULTF $P1 $P2 $T1 }
+;MULTF $P1 $P2 $T1 		{PRED nodes: LINK  }		{SUCC nodes: STOREF $T1 $L1 }
+;STOREF $T1 $L1 		{PRED nodes: MULTF $P1 $P2 $T1 }		{SUCC nodes: STOREF $L1 $R }
+;STOREF $L1 $R 		{PRED nodes: STOREF $T1 $L1 }		{SUCC nodes: RET }
+;RET 		{PRED nodes: STOREF $L1 $R }		{SUCC nodes:}
+;Printing IRNode's
+;LABEL main 		{PRED nodes:}		{SUCC nodes: LINK  }
+;LINK  		{PRED nodes: LABEL main }		{SUCC nodes: WRITES intro }
+;WRITES intro 		{PRED nodes: LINK  }		{SUCC nodes: WRITES first }
+;WRITES first 		{PRED nodes: WRITES intro }		{SUCC nodes: READF $L1 }
+;READF $L1 		{PRED nodes: WRITES first }		{SUCC nodes: WRITES second }
+;WRITES second 		{PRED nodes: READF $L1 }		{SUCC nodes: READF $L2 }
+;READF $L2 		{PRED nodes: WRITES second }		{SUCC nodes: WRITES third }
+;WRITES third 		{PRED nodes: READF $L2 }		{SUCC nodes: READF $L3 }
+;READF $L3 		{PRED nodes: WRITES third }		{SUCC nodes: PUSH }
+;PUSH 		{PRED nodes: READF $L3 }		{SUCC nodes: PUSH $L1 }
+;PUSH $L1 		{PRED nodes: PUSH }		{SUCC nodes: PUSH $L2 }
+;PUSH $L2 		{PRED nodes: PUSH $L1 }		{SUCC nodes: JSR multiply }
+;JSR multiply 		{PRED nodes: PUSH $L2 }		{SUCC nodes: POP }
+;POP 		{PRED nodes: JSR multiply }		{SUCC nodes: POP }
+;POP 		{PRED nodes: POP }		{SUCC nodes: POP $T1 }
+;POP $T1 		{PRED nodes: POP }		{SUCC nodes: STOREF $T1 $L4 }
+;STOREF $T1 $L4 		{PRED nodes: POP $T1 }		{SUCC nodes: PUSH }
+;PUSH 		{PRED nodes: STOREF $T1 $L4 }		{SUCC nodes: PUSH $L4 }
+;PUSH $L4 		{PRED nodes: PUSH }		{SUCC nodes: PUSH $L3 }
+;PUSH $L3 		{PRED nodes: PUSH $L4 }		{SUCC nodes: JSR add }
+;JSR add 		{PRED nodes: PUSH $L3 }		{SUCC nodes: POP }
+;POP 		{PRED nodes: JSR add }		{SUCC nodes: POP }
+;POP 		{PRED nodes: POP }		{SUCC nodes: POP $T2 }
+;POP $T2 		{PRED nodes: POP }		{SUCC nodes: STOREF $T2 $L5 }
+;STOREF $T2 $L5 		{PRED nodes: POP $T2 }		{SUCC nodes: WRITEF $L1 }
+;WRITEF $L1 		{PRED nodes: STOREF $T2 $L5 }		{SUCC nodes: WRITES star }
+;WRITES star 		{PRED nodes: WRITEF $L1 }		{SUCC nodes: WRITEF $L2 }
+;WRITEF $L2 		{PRED nodes: WRITES star }		{SUCC nodes: WRITES plus }
+;WRITES plus 		{PRED nodes: WRITEF $L2 }		{SUCC nodes: WRITEF $L3 }
+;WRITEF $L3 		{PRED nodes: WRITES plus }		{SUCC nodes: WRITES equal }
+;WRITES equal 		{PRED nodes: WRITEF $L3 }		{SUCC nodes: WRITEF $L5 }
+;WRITEF $L5 		{PRED nodes: WRITES equal }		{SUCC nodes: WRITES eol }
+;WRITES eol 		{PRED nodes: WRITEF $L5 }		{SUCC nodes: STOREI 0 $T3 }
+;STOREI 0 $T3 		{PRED nodes: WRITES eol }		{SUCC nodes: STOREI $T3 $R }
+;STOREI $T3 $R 		{PRED nodes: STOREI 0 $T3 }		{SUCC nodes: RET }
+;RET 		{PRED nodes: STOREI $T3 $R }		{SUCC nodes:}
+str intro "You will be asked for three float numbers\n"
+str first "Please enter the first float number: "
+str second "Please enter the second float number: "
+str third "Please enter the third float number: "
+str eol "\n"
+str star "*"
+str plus "+"
+str equal "="
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+;generating code for function add
+;LABEL add 
+;Spilling registers at end of Basic Block
+label add
+;LINK  
+;num local: 1 num temp: 1
+link 2
+;ADDF $P1 $P2 $T1 
+;ensure(): $P1 gets register r3 { r0->null r1->null r2->null r3->$P1 }
+;loading $P1 to register r3
+move $7 r3
+;ensure(): $P2 gets register r2 { r0->null r1->null r2->$P2 r3->$P1 }
+;loading $P2 to register r2
+move $6 r2
+;Switching owner of register r3 to $T1 { r0->null r1->null r2->$P2 r3->$P1 }
+;Spilling is removed: variable $P1 is dead after ADDF $P1 $P2 $T1  liveout {$T1 }
+addr r2 r3
+;Freeing unused variable $P2
+;Spilling is removed: variable $P2 is dead after ADDF $P1 $P2 $T1  liveout {$T1 }
+;STOREF $T1 $L1 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after STOREF $T1 $L1  liveout {$L1 }
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;STOREF $L1 $R 
+;ensure(): $L1 has register r3 { r0->null r1->null r2->null r3->$L1 }
+;Freeing unused variable $L1
+;Spilling is removed: variable $L1 is dead after STOREF $L1 $R  liveout {$R }
+move r3 $8
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;generating code for function multiply
+;LABEL multiply 
+;Spilling registers at end of Basic Block
+label multiply
+;LINK  
+;num local: 1 num temp: 1
+link 2
+;MULTF $P1 $P2 $T1 
+;ensure(): $P1 gets register r3 { r0->null r1->null r2->null r3->$P1 }
+;loading $P1 to register r3
+move $7 r3
+;ensure(): $P2 gets register r2 { r0->null r1->null r2->$P2 r3->$P1 }
+;loading $P2 to register r2
+move $6 r2
+;Switching owner of register r3 to $T1 { r0->null r1->null r2->$P2 r3->$P1 }
+;Spilling is removed: variable $P1 is dead after MULTF $P1 $P2 $T1  liveout {$T1 }
+mulr r2 r3
+;Freeing unused variable $P2
+;Spilling is removed: variable $P2 is dead after MULTF $P1 $P2 $T1  liveout {$T1 }
+;STOREF $T1 $L1 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after STOREF $T1 $L1  liveout {$L1 }
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;STOREF $L1 $R 
+;ensure(): $L1 has register r3 { r0->null r1->null r2->null r3->$L1 }
+;Freeing unused variable $L1
+;Spilling is removed: variable $L1 is dead after STOREF $L1 $R  liveout {$R }
+move r3 $8
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+;generating code for function main
+;LABEL main 
+;Spilling registers at end of Basic Block
+label main
+;LINK  
+;num local: 5 num temp: 3
+link 8
+;WRITES intro 
+sys writes intro
+;WRITES first 
+sys writes first
+;READF $L1 
+sys readr $-1
+;WRITES second 
+sys writes second
+;READF $L2 
+sys readr $-2
+;WRITES third 
+sys writes third
+;READF $L3 
+sys readr $-3
+;PUSH 
+push 
+;PUSH $L1 
+;ensure(): $L1 gets register r3 { r0->null r1->null r2->null r3->$L1 }
+;loading $L1 to register r3
+move $-1 r3
+push r3
+;Freeing unused variable $L1
+;Spilling variable: $L1
+move r3 $-1
+;PUSH $L2 
+;ensure(): $L2 gets register r3 { r0->null r1->null r2->null r3->$L2 }
+;loading $L2 to register r3
+move $-2 r3
+push r3
+;Freeing unused variable $L2
+;Spilling variable: $L2
+move r3 $-2
+;JSR multiply 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr multiply
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T1 
+;ensure(): $T1 gets register r3 { r0->null r1->null r2->null r3->$T1 }
+pop r3
+;STOREF $T1 $L4 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after STOREF $T1 $L4  liveout {$L3 $L1 $L4 first third star plus eol equal $L2 second intro }
+;ensure(): $L4 gets register r3 { r0->null r1->null r2->null r3->$L4 }
+;PUSH 
+push 
+;PUSH $L4 
+;ensure(): $L4 has register r3 { r0->null r1->null r2->null r3->$L4 }
+push r3
+;Freeing unused variable $L4
+;Spilling is removed: variable $L4 is dead after PUSH $L4  liveout {$L3 plus eol equal $L1 first $L2 second third star intro }
+;PUSH $L3 
+;ensure(): $L3 gets register r3 { r0->null r1->null r2->null r3->$L3 }
+;loading $L3 to register r3
+move $-3 r3
+push r3
+;Freeing unused variable $L3
+;Spilling variable: $L3
+move r3 $-3
+;JSR add 
+;Spilling registers at end of Basic Block
+push r0
+push r1
+push r2
+push r3
+jsr add
+pop r3
+pop r2
+pop r1
+pop r0
+;POP 
+pop 
+;POP 
+pop 
+;POP $T2 
+;ensure(): $T2 gets register r3 { r0->null r1->null r2->null r3->$T2 }
+pop r3
+;STOREF $T2 $L5 
+;ensure(): $T2 has register r3 { r0->null r1->null r2->null r3->$T2 }
+;Freeing unused variable $T2
+;Spilling is removed: variable $T2 is dead after STOREF $T2 $L5  liveout {$L3 plus eol equal $L1 $L2 star $L5 }
+;ensure(): $L5 gets register r3 { r0->null r1->null r2->null r3->$L5 }
+;WRITEF $L1 
+;ensure(): $L1 gets register r2 { r0->null r1->null r2->$L1 r3->$L5 }
+;loading $L1 to register r2
+move $-1 r2
+sys writer r2
+;Freeing unused variable $L1
+;Spilling is removed: variable $L1 is dead after WRITEF $L1  liveout {$L3 plus eol equal $L2 star $L5 }
+;WRITES star 
+sys writes star
+;WRITEF $L2 
+;ensure(): $L2 gets register r2 { r0->null r1->null r2->$L2 r3->$L5 }
+;loading $L2 to register r2
+move $-2 r2
+sys writer r2
+;Freeing unused variable $L2
+;Spilling is removed: variable $L2 is dead after WRITEF $L2  liveout {$L3 plus eol equal $L5 }
+;WRITES plus 
+sys writes plus
+;WRITEF $L3 
+;ensure(): $L3 gets register r2 { r0->null r1->null r2->$L3 r3->$L5 }
+;loading $L3 to register r2
+move $-3 r2
+sys writer r2
+;Freeing unused variable $L3
+;Spilling is removed: variable $L3 is dead after WRITEF $L3  liveout {eol equal $L5 }
+;WRITES equal 
+sys writes equal
+;WRITEF $L5 
+;ensure(): $L5 has register r3 { r0->null r1->null r2->null r3->$L5 }
+sys writer r3
+;Freeing unused variable $L5
+;Spilling is removed: variable $L5 is dead after WRITEF $L5  liveout {eol }
+;WRITES eol 
+sys writes eol
+;STOREI 0 $T3 
+;ensure(): $T3 gets register r3 { r0->null r1->null r2->null r3->$T3 }
+move 0 r3
+;STOREI $T3 $R 
+;ensure(): $T3 has register r3 { r0->null r1->null r2->null r3->$T3 }
+;Freeing unused variable $T3
+;Spilling is removed: variable $T3 is dead after STOREI $T3 $R  liveout {$R }
+move r3 $6
+;RET 
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+end

@@ -1,0 +1,648 @@
+;Option: c
+;Option: df
+;Option: reg
+;Option: live
+;Printing IRNode's
+;LABEL main 		{PRED nodes:}		{SUCC nodes: LINK  }
+;LINK  		{PRED nodes: LABEL main }		{SUCC nodes: STOREI 1 $T1 }
+;STOREI 1 $T1 		{PRED nodes: LINK  }		{SUCC nodes: STOREI $T1 a }
+;STOREI $T1 a 		{PRED nodes: STOREI 1 $T1 }		{SUCC nodes: STOREI 2 $T2 }
+;STOREI 2 $T2 		{PRED nodes: STOREI $T1 a }		{SUCC nodes: STOREI $T2 b }
+;STOREI $T2 b 		{PRED nodes: STOREI 2 $T2 }		{SUCC nodes: STOREI 10 $T3 }
+;STOREI 10 $T3 		{PRED nodes: STOREI $T2 b }		{SUCC nodes: STOREI $T3 c }
+;STOREI $T3 c 		{PRED nodes: STOREI 10 $T3 }		{SUCC nodes: STOREI 20 $T4 }
+;STOREI 20 $T4 		{PRED nodes: STOREI $T3 c }		{SUCC nodes: STOREI $T4 d }
+;STOREI $T4 d 		{PRED nodes: STOREI 20 $T4 }		{SUCC nodes: WRITEI a }
+;WRITEI a 		{PRED nodes: STOREI $T4 d }		{SUCC nodes: WRITEI b }
+;WRITEI b 		{PRED nodes: WRITEI a }		{SUCC nodes: WRITEI c }
+;WRITEI c 		{PRED nodes: WRITEI b }		{SUCC nodes: WRITEI d }
+;WRITEI d 		{PRED nodes: WRITEI c }		{SUCC nodes: ADDI a b $T5 }
+;ADDI a b $T5 		{PRED nodes: WRITEI d }		{SUCC nodes: STOREI $T5 a }
+;STOREI $T5 a 		{PRED nodes: ADDI a b $T5 }		{SUCC nodes: WRITEI a }
+;WRITEI a 		{PRED nodes: STOREI $T5 a }		{SUCC nodes: MULTI a c $T6 }
+;MULTI a c $T6 		{PRED nodes: WRITEI a }		{SUCC nodes: STOREI $T6 b }
+;STOREI $T6 b 		{PRED nodes: MULTI a c $T6 }		{SUCC nodes: WRITEI b }
+;WRITEI b 		{PRED nodes: STOREI $T6 b }		{SUCC nodes: STOREI 0 $T7 }
+;STOREI 0 $T7 		{PRED nodes: WRITEI b }		{SUCC nodes: SUBI $T7 a $T8 }
+;SUBI $T7 a $T8 		{PRED nodes: STOREI 0 $T7 }		{SUCC nodes: ADDI $T8 b $T9 }
+;ADDI $T8 b $T9 		{PRED nodes: SUBI $T7 a $T8 }		{SUCC nodes: STOREI $T9 c }
+;STOREI $T9 c 		{PRED nodes: ADDI $T8 b $T9 }		{SUCC nodes: WRITEI c }
+;WRITEI c 		{PRED nodes: STOREI $T9 c }		{SUCC nodes: STOREI 0 $T10 }
+;STOREI 0 $T10 		{PRED nodes: WRITEI c }		{SUCC nodes: SUBI $T10 d $T11 }
+;SUBI $T10 d $T11 		{PRED nodes: STOREI 0 $T10 }		{SUCC nodes: STOREI $T11 d }
+;STOREI $T11 d 		{PRED nodes: SUBI $T10 d $T11 }		{SUCC nodes: WRITEI d }
+;WRITEI d 		{PRED nodes: STOREI $T11 d }		{SUCC nodes: ADDI a b $T12 }
+;ADDI a b $T12 		{PRED nodes: WRITEI d }		{SUCC nodes: ADDI d c $T13 }
+;ADDI d c $T13 		{PRED nodes: ADDI a b $T12 }		{SUCC nodes: MULTI $T12 $T13 $T14 }
+;MULTI $T12 $T13 $T14 		{PRED nodes: ADDI d c $T13 }		{SUCC nodes: ADDI a b $T15 }
+;ADDI a b $T15 		{PRED nodes: MULTI $T12 $T13 $T14 }		{SUCC nodes: ADDI $T15 c $T16 }
+;ADDI $T15 c $T16 		{PRED nodes: ADDI a b $T15 }		{SUCC nodes: ADDI $T16 d $T17 }
+;ADDI $T16 d $T17 		{PRED nodes: ADDI $T15 c $T16 }		{SUCC nodes: DIVI $T17 a $T18 }
+;DIVI $T17 a $T18 		{PRED nodes: ADDI $T16 d $T17 }		{SUCC nodes: SUBI $T14 $T18 $T19 }
+;SUBI $T14 $T18 $T19 		{PRED nodes: DIVI $T17 a $T18 }		{SUCC nodes: STOREI $T19 a }
+;STOREI $T19 a 		{PRED nodes: SUBI $T14 $T18 $T19 }		{SUCC nodes: WRITEI a }
+;WRITEI a 		{PRED nodes: STOREI $T19 a }		{SUCC nodes: STOREI 10 $T20 }
+;STOREI 10 $T20 		{PRED nodes: WRITEI a }		{SUCC nodes: ADDI a $T20 $T21 }
+;ADDI a $T20 $T21 		{PRED nodes: STOREI 10 $T20 }		{SUCC nodes: STOREI $T21 a }
+;STOREI $T21 a 		{PRED nodes: ADDI a $T20 $T21 }		{SUCC nodes: WRITEI a }
+;WRITEI a 		{PRED nodes: STOREI $T21 a }		{SUCC nodes: ADDI b a $T22 }
+;ADDI b a $T22 		{PRED nodes: WRITEI a }		{SUCC nodes: STOREI 10 $T23 }
+;STOREI 10 $T23 		{PRED nodes: ADDI b a $T22 }		{SUCC nodes: ADDI $T22 $T23 $T24 }
+;ADDI $T22 $T23 $T24 		{PRED nodes: STOREI 10 $T23 }		{SUCC nodes: STOREI $T24 b }
+;STOREI $T24 b 		{PRED nodes: ADDI $T22 $T23 $T24 }		{SUCC nodes: WRITEI b }
+;WRITEI b 		{PRED nodes: STOREI $T24 b }		{SUCC nodes: STOREI 0 $T25 }
+;STOREI 0 $T25 		{PRED nodes: WRITEI b }		{SUCC nodes: STOREI 10 $T26 }
+;STOREI 10 $T26 		{PRED nodes: STOREI 0 $T25 }		{SUCC nodes: SUBI $T25 $T26 $T27 }
+;SUBI $T25 $T26 $T27 		{PRED nodes: STOREI 10 $T26 }		{SUCC nodes: STOREI $T27 c }
+;STOREI $T27 c 		{PRED nodes: SUBI $T25 $T26 $T27 }		{SUCC nodes: WRITEI c }
+;WRITEI c 		{PRED nodes: STOREI $T27 c }		{SUCC nodes: STOREF 1.0 $T28 }
+;STOREF 1.0 $T28 		{PRED nodes: WRITEI c }		{SUCC nodes: STOREF $T28 x }
+;STOREF $T28 x 		{PRED nodes: STOREF 1.0 $T28 }		{SUCC nodes: STOREF 2.0 $T29 }
+;STOREF 2.0 $T29 		{PRED nodes: STOREF $T28 x }		{SUCC nodes: STOREF $T29 y }
+;STOREF $T29 y 		{PRED nodes: STOREF 2.0 $T29 }		{SUCC nodes: STOREF 3.14159 $T30 }
+;STOREF 3.14159 $T30 		{PRED nodes: STOREF $T29 y }		{SUCC nodes: STOREF $T30 z }
+;STOREF $T30 z 		{PRED nodes: STOREF 3.14159 $T30 }		{SUCC nodes: WRITEF x }
+;WRITEF x 		{PRED nodes: STOREF $T30 z }		{SUCC nodes: WRITEF z }
+;WRITEF z 		{PRED nodes: WRITEF x }		{SUCC nodes: WRITEF y }
+;WRITEF y 		{PRED nodes: WRITEF z }		{SUCC nodes: STOREF 2.0 $T31 }
+;STOREF 2.0 $T31 		{PRED nodes: WRITEF y }		{SUCC nodes: DIVF z $T31 $T32 }
+;DIVF z $T31 $T32 		{PRED nodes: STOREF 2.0 $T31 }		{SUCC nodes: STOREF $T32 x }
+;STOREF $T32 x 		{PRED nodes: DIVF z $T31 $T32 }		{SUCC nodes: DIVF z y $T33 }
+;DIVF z y $T33 		{PRED nodes: STOREF $T32 x }		{SUCC nodes: STOREF $T33 y }
+;STOREF $T33 y 		{PRED nodes: DIVF z y $T33 }		{SUCC nodes: WRITEF x }
+;WRITEF x 		{PRED nodes: STOREF $T33 y }		{SUCC nodes: WRITEF y }
+;WRITEF y 		{PRED nodes: WRITEF x }		{SUCC nodes: ADDF x y $T34 }
+;ADDF x y $T34 		{PRED nodes: WRITEF y }		{SUCC nodes: ADDF $T34 z $T35 }
+;ADDF $T34 z $T35 		{PRED nodes: ADDF x y $T34 }		{SUCC nodes: DIVF $T35 z $T36 }
+;DIVF $T35 z $T36 		{PRED nodes: ADDF $T34 z $T35 }		{SUCC nodes: STOREF $T36 t }
+;STOREF $T36 t 		{PRED nodes: DIVF $T35 z $T36 }		{SUCC nodes: WRITEF t }
+;WRITEF t 		{PRED nodes: STOREF $T36 t }		{SUCC nodes: MULTF t t $T37 }
+;MULTF t t $T37 		{PRED nodes: WRITEF t }		{SUCC nodes: STOREF $T37 t }
+;STOREF $T37 t 		{PRED nodes: MULTF t t $T37 }		{SUCC nodes: WRITEF t }
+;WRITEF t 		{PRED nodes: STOREF $T37 t }		{SUCC nodes: ADDF t z $T38 }
+;ADDF t z $T38 		{PRED nodes: WRITEF t }		{SUCC nodes: ADDF $T38 t $T39 }
+;ADDF $T38 t $T39 		{PRED nodes: ADDF t z $T38 }		{SUCC nodes: STOREF 2.0 $T40 }
+;STOREF 2.0 $T40 		{PRED nodes: ADDF $T38 t $T39 }		{SUCC nodes: DIVF t $T40 $T41 }
+;DIVF t $T40 $T41 		{PRED nodes: STOREF 2.0 $T40 }		{SUCC nodes: ADDF $T39 $T41 $T42 }
+;ADDF $T39 $T41 $T42 		{PRED nodes: DIVF t $T40 $T41 }		{SUCC nodes: STOREF 4.0 $T43 }
+;STOREF 4.0 $T43 		{PRED nodes: ADDF $T39 $T41 $T42 }		{SUCC nodes: DIVF z $T43 $T44 }
+;DIVF z $T43 $T44 		{PRED nodes: STOREF 4.0 $T43 }		{SUCC nodes: ADDF $T42 $T44 $T45 }
+;ADDF $T42 $T44 $T45 		{PRED nodes: DIVF z $T43 $T44 }		{SUCC nodes: STOREF 5.0 $T46 }
+;STOREF 5.0 $T46 		{PRED nodes: ADDF $T42 $T44 $T45 }		{SUCC nodes: DIVF z $T46 $T47 }
+;DIVF z $T46 $T47 		{PRED nodes: STOREF 5.0 $T46 }		{SUCC nodes: ADDF $T45 $T47 $T48 }
+;ADDF $T45 $T47 $T48 		{PRED nodes: DIVF z $T46 $T47 }		{SUCC nodes: STOREF 6.0 $T49 }
+;STOREF 6.0 $T49 		{PRED nodes: ADDF $T45 $T47 $T48 }		{SUCC nodes: DIVF z $T49 $T50 }
+;DIVF z $T49 $T50 		{PRED nodes: STOREF 6.0 $T49 }		{SUCC nodes: ADDF $T48 $T50 $T51 }
+;ADDF $T48 $T50 $T51 		{PRED nodes: DIVF z $T49 $T50 }		{SUCC nodes: STOREF 7.0 $T52 }
+;STOREF 7.0 $T52 		{PRED nodes: ADDF $T48 $T50 $T51 }		{SUCC nodes: DIVF z $T52 $T53 }
+;DIVF z $T52 $T53 		{PRED nodes: STOREF 7.0 $T52 }		{SUCC nodes: ADDF $T51 $T53 $T54 }
+;ADDF $T51 $T53 $T54 		{PRED nodes: DIVF z $T52 $T53 }		{SUCC nodes: STOREF $T54 t }
+;STOREF $T54 t 		{PRED nodes: ADDF $T51 $T53 $T54 }		{SUCC nodes: WRITEF t }
+;WRITEF t 		{PRED nodes: STOREF $T54 t }		{SUCC nodes: RET  }
+;RET  		{PRED nodes: WRITEF t }		{SUCC nodes:}
+var a
+var b
+var c
+var d
+var x
+var y
+var z
+var t
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+;generating code for function main
+;LABEL main 
+;Spilling registers at end of Basic Block
+label main
+;LINK  
+;num local: 0 num temp: 54
+link 54
+;STOREI 1 $T1 
+;ensure(): $T1 gets register r3 { r0->null r1->null r2->null r3->$T1 }
+move 1 r3
+;STOREI $T1 a 
+;ensure(): $T1 has register r3 { r0->null r1->null r2->null r3->$T1 }
+;Freeing unused variable $T1
+;Spilling is removed: variable $T1 is dead after STOREI $T1 a  liveout {a $R }
+;ensure(): a gets register r3 { r0->null r1->null r2->null r3->a }
+;STOREI 2 $T2 
+;ensure(): $T2 gets register r2 { r0->null r1->null r2->$T2 r3->a }
+move 2 r2
+;STOREI $T2 b 
+;ensure(): $T2 has register r2 { r0->null r1->null r2->$T2 r3->a }
+;Freeing unused variable $T2
+;Spilling is removed: variable $T2 is dead after STOREI $T2 b  liveout {a b $R }
+;ensure(): b gets register r2 { r0->null r1->null r2->b r3->a }
+;STOREI 10 $T3 
+;ensure(): $T3 gets register r1 { r0->null r1->$T3 r2->b r3->a }
+move 10 r1
+;STOREI $T3 c 
+;ensure(): $T3 has register r1 { r0->null r1->$T3 r2->b r3->a }
+;Freeing unused variable $T3
+;Spilling is removed: variable $T3 is dead after STOREI $T3 c  liveout {a b $R c }
+;ensure(): c gets register r1 { r0->null r1->c r2->b r3->a }
+;STOREI 20 $T4 
+;ensure(): $T4 gets register r0 { r0->$T4 r1->c r2->b r3->a }
+move 20 r0
+;STOREI $T4 d 
+;ensure(): $T4 has register r0 { r0->$T4 r1->c r2->b r3->a }
+;Freeing unused variable $T4
+;Spilling is removed: variable $T4 is dead after STOREI $T4 d  liveout {d a b $R c }
+;ensure(): d gets register r0 { r0->d r1->c r2->b r3->a }
+;WRITEI a 
+;ensure(): a has register r3 { r0->d r1->c r2->b r3->a }
+sys writei r3
+;WRITEI b 
+;ensure(): b has register r2 { r0->d r1->c r2->b r3->a }
+sys writei r2
+;WRITEI c 
+;ensure(): c has register r1 { r0->d r1->c r2->b r3->a }
+sys writei r1
+;WRITEI d 
+;ensure(): d has register r0 { r0->d r1->c r2->b r3->a }
+sys writei r0
+;ADDI a b $T5 
+;ensure(): a has register r3 { r0->d r1->c r2->b r3->a }
+;ensure(): b has register r2 { r0->d r1->c r2->b r3->a }
+;Switching owner of register r3 to $T5 { r0->d r1->c r2->b r3->a }
+;Spilling is removed: variable a is dead after ADDI a b $T5  liveout {d $R $T5 c }
+addi r2 r3
+;STOREI $T5 a 
+;ensure(): $T5 has register r3 { r0->d r1->c r2->b r3->$T5 }
+;Freeing unused variable $T5
+;Spilling is removed: variable $T5 is dead after STOREI $T5 a  liveout {d a $R c }
+;ensure(): a gets register r3 { r0->d r1->c r2->b r3->a }
+;WRITEI a 
+;ensure(): a has register r3 { r0->d r1->c r2->b r3->a }
+sys writei r3
+;MULTI a c $T6 
+;ensure(): a has register r3 { r0->d r1->c r2->b r3->a }
+;ensure(): c has register r1 { r0->d r1->c r2->b r3->a }
+;Switching owner of register r3 to $T6 { r0->d r1->c r2->b r3->a }
+;Spilling variable: a
+move r3 a
+muli r1 r3
+;STOREI $T6 b 
+;ensure(): $T6 has register r3 { r0->d r1->c r2->b r3->$T6 }
+;Freeing unused variable $T6
+;Spilling is removed: variable $T6 is dead after STOREI $T6 b  liveout {d a b $R }
+;ensure(): b has register r2 { r0->d r1->c r2->b r3->null }
+move r3 r2
+;WRITEI b 
+;ensure(): b has register r2 { r0->d r1->c r2->b r3->null }
+sys writei r2
+;STOREI 0 $T7 
+;ensure(): $T7 gets register r3 { r0->d r1->c r2->b r3->$T7 }
+move 0 r3
+;SUBI $T7 a $T8 
+;ensure(): $T7 has register r3 { r0->d r1->c r2->b r3->$T7 }
+;allocate() has to spill d
+;Spilling variable: d
+move r0 d
+;ensure(): a gets register r0 { r0->a r1->c r2->b r3->$T7 }
+;loading a to register r0
+move a r0
+;Switching owner of register r3 to $T8 { r0->a r1->c r2->b r3->$T7 }
+;Spilling is removed: variable $T7 is dead after SUBI $T7 a $T8  liveout {$T8 d a b $R }
+subi r0 r3
+;ADDI $T8 b $T9 
+;ensure(): $T8 has register r3 { r0->a r1->c r2->b r3->$T8 }
+;ensure(): b has register r2 { r0->a r1->c r2->b r3->$T8 }
+;Switching owner of register r3 to $T9 { r0->a r1->c r2->b r3->$T8 }
+;Spilling is removed: variable $T8 is dead after ADDI $T8 b $T9  liveout {$T9 d a b $R }
+addi r2 r3
+;STOREI $T9 c 
+;ensure(): $T9 has register r3 { r0->a r1->c r2->b r3->$T9 }
+;Freeing unused variable $T9
+;Spilling is removed: variable $T9 is dead after STOREI $T9 c  liveout {d a b $R c }
+;ensure(): c has register r1 { r0->a r1->c r2->b r3->null }
+move r3 r1
+;WRITEI c 
+;ensure(): c has register r1 { r0->a r1->c r2->b r3->null }
+sys writei r1
+;STOREI 0 $T10 
+;ensure(): $T10 gets register r3 { r0->a r1->c r2->b r3->$T10 }
+move 0 r3
+;SUBI $T10 d $T11 
+;ensure(): $T10 has register r3 { r0->a r1->c r2->b r3->$T10 }
+;allocate() has to spill c
+;Spilling variable: c
+move r1 c
+;ensure(): d gets register r1 { r0->a r1->d r2->b r3->$T10 }
+;loading d to register r1
+move d r1
+;Switching owner of register r3 to $T11 { r0->a r1->d r2->b r3->$T10 }
+;Spilling is removed: variable $T10 is dead after SUBI $T10 d $T11  liveout {$T11 a b $R c }
+subi r1 r3
+;STOREI $T11 d 
+;ensure(): $T11 has register r3 { r0->a r1->d r2->b r3->$T11 }
+;Freeing unused variable $T11
+;Spilling is removed: variable $T11 is dead after STOREI $T11 d  liveout {d a b $R c }
+;ensure(): d has register r1 { r0->a r1->d r2->b r3->null }
+move r3 r1
+;WRITEI d 
+;ensure(): d has register r1 { r0->a r1->d r2->b r3->null }
+sys writei r1
+;ADDI a b $T12 
+;ensure(): a has register r0 { r0->a r1->d r2->b r3->null }
+;ensure(): b has register r2 { r0->a r1->d r2->b r3->null }
+;Switching owner of register r0 to $T12 { r0->a r1->d r2->b r3->null }
+;Spilling variable: a
+move r0 a
+addi r2 r0
+;ADDI d c $T13 
+;ensure(): d has register r1 { r0->$T12 r1->d r2->b r3->null }
+;ensure(): c gets register r3 { r0->$T12 r1->d r2->b r3->c }
+;loading c to register r3
+move c r3
+;Switching owner of register r1 to $T13 { r0->$T12 r1->d r2->b r3->c }
+;Spilling variable: d
+move r1 d
+addi r3 r1
+;MULTI $T12 $T13 $T14 
+;ensure(): $T12 has register r0 { r0->$T12 r1->$T13 r2->b r3->c }
+;ensure(): $T13 has register r1 { r0->$T12 r1->$T13 r2->b r3->c }
+;Switching owner of register r0 to $T14 { r0->$T12 r1->$T13 r2->b r3->c }
+;Spilling is removed: variable $T12 is dead after MULTI $T12 $T13 $T14  liveout {d a b $R $T14 c }
+muli r1 r0
+;Freeing unused variable $T13
+;Spilling is removed: variable $T13 is dead after MULTI $T12 $T13 $T14  liveout {d a b $R $T14 c }
+;ADDI a b $T15 
+;ensure(): a gets register r1 { r0->$T14 r1->a r2->b r3->c }
+;loading a to register r1
+move a r1
+;ensure(): b has register r2 { r0->$T14 r1->a r2->b r3->c }
+;Switching owner of register r1 to $T15 { r0->$T14 r1->a r2->b r3->c }
+;Spilling variable: a
+move r1 a
+addi r2 r1
+;ADDI $T15 c $T16 
+;ensure(): $T15 has register r1 { r0->$T14 r1->$T15 r2->b r3->c }
+;ensure(): c has register r3 { r0->$T14 r1->$T15 r2->b r3->c }
+;Switching owner of register r1 to $T16 { r0->$T14 r1->$T15 r2->b r3->c }
+;Spilling is removed: variable $T15 is dead after ADDI $T15 c $T16  liveout {d a b $R $T14 $T16 }
+addi r3 r1
+;ADDI $T16 d $T17 
+;ensure(): $T16 has register r1 { r0->$T14 r1->$T16 r2->b r3->c }
+;allocate() has to spill c
+;Spilling is removed: variable c is dead after ADDI $T16 d $T17  liveout {a b $R $T14 $T17 }
+;ensure(): d gets register r3 { r0->$T14 r1->$T16 r2->b r3->d }
+;loading d to register r3
+move d r3
+;Switching owner of register r1 to $T17 { r0->$T14 r1->$T16 r2->b r3->d }
+;Spilling is removed: variable $T16 is dead after ADDI $T16 d $T17  liveout {a b $R $T14 $T17 }
+addi r3 r1
+;Freeing unused variable d
+;Spilling is removed: variable d is dead after ADDI $T16 d $T17  liveout {a b $R $T14 $T17 }
+;DIVI $T17 a $T18 
+;ensure(): $T17 has register r1 { r0->$T14 r1->$T17 r2->b r3->null }
+;ensure(): a gets register r3 { r0->$T14 r1->$T17 r2->b r3->a }
+;loading a to register r3
+move a r3
+;Switching owner of register r1 to $T18 { r0->$T14 r1->$T17 r2->b r3->a }
+;Spilling is removed: variable $T17 is dead after DIVI $T17 a $T18  liveout {b $R $T14 $T18 }
+divi r3 r1
+;SUBI $T14 $T18 $T19 
+;ensure(): $T14 has register r0 { r0->$T14 r1->$T18 r2->b r3->a }
+;ensure(): $T18 has register r1 { r0->$T14 r1->$T18 r2->b r3->a }
+;Switching owner of register r0 to $T19 { r0->$T14 r1->$T18 r2->b r3->a }
+;Spilling is removed: variable $T14 is dead after SUBI $T14 $T18 $T19  liveout {$T19 b $R }
+subi r1 r0
+;Freeing unused variable $T18
+;Spilling is removed: variable $T18 is dead after SUBI $T14 $T18 $T19  liveout {$T19 b $R }
+;STOREI $T19 a 
+;ensure(): $T19 has register r0 { r0->$T19 r1->null r2->b r3->a }
+;Freeing unused variable $T19
+;Spilling is removed: variable $T19 is dead after STOREI $T19 a  liveout {a b $R }
+;ensure(): a has register r3 { r0->null r1->null r2->b r3->a }
+move r0 r3
+;WRITEI a 
+;ensure(): a has register r3 { r0->null r1->null r2->b r3->a }
+sys writei r3
+;STOREI 10 $T20 
+;ensure(): $T20 gets register r0 { r0->$T20 r1->null r2->b r3->a }
+move 10 r0
+;ADDI a $T20 $T21 
+;ensure(): a has register r3 { r0->$T20 r1->null r2->b r3->a }
+;ensure(): $T20 has register r0 { r0->$T20 r1->null r2->b r3->a }
+;Switching owner of register r3 to $T21 { r0->$T20 r1->null r2->b r3->a }
+;Spilling is removed: variable a is dead after ADDI a $T20 $T21  liveout {$T21 b $R }
+addi r0 r3
+;Freeing unused variable $T20
+;Spilling is removed: variable $T20 is dead after ADDI a $T20 $T21  liveout {$T21 b $R }
+;STOREI $T21 a 
+;ensure(): $T21 has register r3 { r0->null r1->null r2->b r3->$T21 }
+;Freeing unused variable $T21
+;Spilling is removed: variable $T21 is dead after STOREI $T21 a  liveout {a b $R }
+;ensure(): a gets register r3 { r0->null r1->null r2->b r3->a }
+;WRITEI a 
+;ensure(): a has register r3 { r0->null r1->null r2->b r3->a }
+sys writei r3
+;ADDI b a $T22 
+;ensure(): b has register r2 { r0->null r1->null r2->b r3->a }
+;ensure(): a has register r3 { r0->null r1->null r2->b r3->a }
+;Switching owner of register r2 to $T22 { r0->null r1->null r2->b r3->a }
+;Spilling is removed: variable b is dead after ADDI b a $T22  liveout {$T22 $R }
+addi r3 r2
+;Freeing unused variable a
+;Spilling is removed: variable a is dead after ADDI b a $T22  liveout {$T22 $R }
+;STOREI 10 $T23 
+;ensure(): $T23 gets register r3 { r0->null r1->null r2->$T22 r3->$T23 }
+move 10 r3
+;ADDI $T22 $T23 $T24 
+;ensure(): $T22 has register r2 { r0->null r1->null r2->$T22 r3->$T23 }
+;ensure(): $T23 has register r3 { r0->null r1->null r2->$T22 r3->$T23 }
+;Switching owner of register r2 to $T24 { r0->null r1->null r2->$T22 r3->$T23 }
+;Spilling is removed: variable $T22 is dead after ADDI $T22 $T23 $T24  liveout {$R $T24 }
+addi r3 r2
+;Freeing unused variable $T23
+;Spilling is removed: variable $T23 is dead after ADDI $T22 $T23 $T24  liveout {$R $T24 }
+;STOREI $T24 b 
+;ensure(): $T24 has register r2 { r0->null r1->null r2->$T24 r3->null }
+;Freeing unused variable $T24
+;Spilling is removed: variable $T24 is dead after STOREI $T24 b  liveout {b $R }
+;ensure(): b gets register r2 { r0->null r1->null r2->b r3->null }
+;WRITEI b 
+;ensure(): b has register r2 { r0->null r1->null r2->b r3->null }
+sys writei r2
+;Freeing unused variable b
+;Spilling is removed: variable b is dead after WRITEI b  liveout {$R }
+;STOREI 0 $T25 
+;ensure(): $T25 gets register r2 { r0->null r1->null r2->$T25 r3->null }
+move 0 r2
+;STOREI 10 $T26 
+;ensure(): $T26 gets register r3 { r0->null r1->null r2->$T25 r3->$T26 }
+move 10 r3
+;SUBI $T25 $T26 $T27 
+;ensure(): $T25 has register r2 { r0->null r1->null r2->$T25 r3->$T26 }
+;ensure(): $T26 has register r3 { r0->null r1->null r2->$T25 r3->$T26 }
+;Switching owner of register r2 to $T27 { r0->null r1->null r2->$T25 r3->$T26 }
+;Spilling is removed: variable $T25 is dead after SUBI $T25 $T26 $T27  liveout {$T27 $R }
+subi r3 r2
+;Freeing unused variable $T26
+;Spilling is removed: variable $T26 is dead after SUBI $T25 $T26 $T27  liveout {$T27 $R }
+;STOREI $T27 c 
+;ensure(): $T27 has register r2 { r0->null r1->null r2->$T27 r3->null }
+;Freeing unused variable $T27
+;Spilling is removed: variable $T27 is dead after STOREI $T27 c  liveout {$R c }
+;ensure(): c gets register r2 { r0->null r1->null r2->c r3->null }
+;WRITEI c 
+;ensure(): c has register r2 { r0->null r1->null r2->c r3->null }
+sys writei r2
+;Freeing unused variable c
+;Spilling is removed: variable c is dead after WRITEI c  liveout {$R }
+;STOREF 1.0 $T28 
+;ensure(): $T28 gets register r2 { r0->null r1->null r2->$T28 r3->null }
+move 1.0 r2
+;STOREF $T28 x 
+;ensure(): $T28 has register r2 { r0->null r1->null r2->$T28 r3->null }
+;Freeing unused variable $T28
+;Spilling is removed: variable $T28 is dead after STOREF $T28 x  liveout {x $R }
+;ensure(): x gets register r2 { r0->null r1->null r2->x r3->null }
+;STOREF 2.0 $T29 
+;ensure(): $T29 gets register r3 { r0->null r1->null r2->x r3->$T29 }
+move 2.0 r3
+;STOREF $T29 y 
+;ensure(): $T29 has register r3 { r0->null r1->null r2->x r3->$T29 }
+;Freeing unused variable $T29
+;Spilling is removed: variable $T29 is dead after STOREF $T29 y  liveout {x y $R }
+;ensure(): y gets register r3 { r0->null r1->null r2->x r3->y }
+;STOREF 3.14159 $T30 
+;ensure(): $T30 gets register r0 { r0->$T30 r1->null r2->x r3->y }
+move 3.14159 r0
+;STOREF $T30 z 
+;ensure(): $T30 has register r0 { r0->$T30 r1->null r2->x r3->y }
+;Freeing unused variable $T30
+;Spilling is removed: variable $T30 is dead after STOREF $T30 z  liveout {z x y $R }
+;ensure(): z gets register r0 { r0->z r1->null r2->x r3->y }
+;WRITEF x 
+;ensure(): x has register r2 { r0->z r1->null r2->x r3->y }
+sys writer r2
+;WRITEF z 
+;ensure(): z has register r0 { r0->z r1->null r2->x r3->y }
+sys writer r0
+;WRITEF y 
+;ensure(): y has register r3 { r0->z r1->null r2->x r3->y }
+sys writer r3
+;STOREF 2.0 $T31 
+;ensure(): $T31 gets register r1 { r0->z r1->$T31 r2->x r3->y }
+move 2.0 r1
+;DIVF z $T31 $T32 
+;ensure(): z has register r0 { r0->z r1->$T31 r2->x r3->y }
+;ensure(): $T31 has register r1 { r0->z r1->$T31 r2->x r3->y }
+;Switching owner of register r0 to $T32 { r0->z r1->$T31 r2->x r3->y }
+;Spilling variable: z
+move r0 z
+divr r1 r0
+;Freeing unused variable $T31
+;Spilling is removed: variable $T31 is dead after DIVF z $T31 $T32  liveout {z $T32 y $R }
+;STOREF $T32 x 
+;ensure(): $T32 has register r0 { r0->$T32 r1->null r2->x r3->y }
+;Freeing unused variable $T32
+;Spilling is removed: variable $T32 is dead after STOREF $T32 x  liveout {z x y $R }
+;ensure(): x has register r2 { r0->null r1->null r2->x r3->y }
+move r0 r2
+;DIVF z y $T33 
+;ensure(): z gets register r0 { r0->z r1->null r2->x r3->y }
+;loading z to register r0
+move z r0
+;ensure(): y has register r3 { r0->z r1->null r2->x r3->y }
+;Switching owner of register r0 to $T33 { r0->z r1->null r2->x r3->y }
+;Spilling variable: z
+move r0 z
+divr r3 r0
+;STOREF $T33 y 
+;ensure(): $T33 has register r0 { r0->$T33 r1->null r2->x r3->y }
+;Freeing unused variable $T33
+;Spilling is removed: variable $T33 is dead after STOREF $T33 y  liveout {z x y $R }
+;ensure(): y has register r3 { r0->null r1->null r2->x r3->y }
+move r0 r3
+;WRITEF x 
+;ensure(): x has register r2 { r0->null r1->null r2->x r3->y }
+sys writer r2
+;WRITEF y 
+;ensure(): y has register r3 { r0->null r1->null r2->x r3->y }
+sys writer r3
+;ADDF x y $T34 
+;ensure(): x has register r2 { r0->null r1->null r2->x r3->y }
+;ensure(): y has register r3 { r0->null r1->null r2->x r3->y }
+;Switching owner of register r2 to $T34 { r0->null r1->null r2->x r3->y }
+;Spilling is removed: variable x is dead after ADDF x y $T34  liveout {z $R $T34 }
+addr r3 r2
+;Freeing unused variable y
+;Spilling is removed: variable y is dead after ADDF x y $T34  liveout {z $R $T34 }
+;ADDF $T34 z $T35 
+;ensure(): $T34 has register r2 { r0->null r1->null r2->$T34 r3->null }
+;ensure(): z gets register r3 { r0->null r1->null r2->$T34 r3->z }
+;loading z to register r3
+move z r3
+;Switching owner of register r2 to $T35 { r0->null r1->null r2->$T34 r3->z }
+;Spilling is removed: variable $T34 is dead after ADDF $T34 z $T35  liveout {z $R $T35 }
+addr r3 r2
+;DIVF $T35 z $T36 
+;ensure(): $T35 has register r2 { r0->null r1->null r2->$T35 r3->z }
+;ensure(): z has register r3 { r0->null r1->null r2->$T35 r3->z }
+;Switching owner of register r2 to $T36 { r0->null r1->null r2->$T35 r3->z }
+;Spilling is removed: variable $T35 is dead after DIVF $T35 z $T36  liveout {z $R $T36 }
+divr r3 r2
+;STOREF $T36 t 
+;ensure(): $T36 has register r2 { r0->null r1->null r2->$T36 r3->z }
+;Freeing unused variable $T36
+;Spilling is removed: variable $T36 is dead after STOREF $T36 t  liveout {z $R t }
+;ensure(): t gets register r2 { r0->null r1->null r2->t r3->z }
+;WRITEF t 
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->z }
+sys writer r2
+;MULTF t t $T37 
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->z }
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->z }
+;Switching owner of register r2 to $T37 { r0->null r1->null r2->t r3->z }
+;Spilling is removed: variable t is dead after MULTF t t $T37  liveout {z $T37 $R }
+mulr r2 r2
+;STOREF $T37 t 
+;ensure(): $T37 has register r2 { r0->null r1->null r2->$T37 r3->z }
+;Freeing unused variable $T37
+;Spilling is removed: variable $T37 is dead after STOREF $T37 t  liveout {z $R t }
+;ensure(): t gets register r2 { r0->null r1->null r2->t r3->z }
+;WRITEF t 
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->z }
+sys writer r2
+;ADDF t z $T38 
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->z }
+;ensure(): z has register r3 { r0->null r1->null r2->t r3->z }
+;Switching owner of register r2 to $T38 { r0->null r1->null r2->t r3->z }
+;Spilling variable: t
+move r2 t
+addr r3 r2
+;ADDF $T38 t $T39 
+;ensure(): $T38 has register r2 { r0->null r1->null r2->$T38 r3->z }
+;ensure(): t gets register r0 { r0->t r1->null r2->$T38 r3->z }
+;loading t to register r0
+move t r0
+;Switching owner of register r2 to $T39 { r0->t r1->null r2->$T38 r3->z }
+;Spilling is removed: variable $T38 is dead after ADDF $T38 t $T39  liveout {z $T39 $R t }
+addr r0 r2
+;STOREF 2.0 $T40 
+;ensure(): $T40 gets register r1 { r0->t r1->$T40 r2->$T39 r3->z }
+move 2.0 r1
+;DIVF t $T40 $T41 
+;ensure(): t has register r0 { r0->t r1->$T40 r2->$T39 r3->z }
+;ensure(): $T40 has register r1 { r0->t r1->$T40 r2->$T39 r3->z }
+;Switching owner of register r0 to $T41 { r0->t r1->$T40 r2->$T39 r3->z }
+;Spilling is removed: variable t is dead after DIVF t $T40 $T41  liveout {z $T39 $T41 $R }
+divr r1 r0
+;Freeing unused variable $T40
+;Spilling is removed: variable $T40 is dead after DIVF t $T40 $T41  liveout {z $T39 $T41 $R }
+;ADDF $T39 $T41 $T42 
+;ensure(): $T39 has register r2 { r0->$T41 r1->null r2->$T39 r3->z }
+;ensure(): $T41 has register r0 { r0->$T41 r1->null r2->$T39 r3->z }
+;Switching owner of register r2 to $T42 { r0->$T41 r1->null r2->$T39 r3->z }
+;Spilling is removed: variable $T39 is dead after ADDF $T39 $T41 $T42  liveout {z $T42 $R }
+addr r0 r2
+;Freeing unused variable $T41
+;Spilling is removed: variable $T41 is dead after ADDF $T39 $T41 $T42  liveout {z $T42 $R }
+;STOREF 4.0 $T43 
+;ensure(): $T43 gets register r0 { r0->$T43 r1->null r2->$T42 r3->z }
+move 4.0 r0
+;DIVF z $T43 $T44 
+;ensure(): z has register r3 { r0->$T43 r1->null r2->$T42 r3->z }
+;ensure(): $T43 has register r0 { r0->$T43 r1->null r2->$T42 r3->z }
+;Switching owner of register r3 to $T44 { r0->$T43 r1->null r2->$T42 r3->z }
+;Spilling variable: z
+move r3 z
+divr r0 r3
+;Freeing unused variable $T43
+;Spilling is removed: variable $T43 is dead after DIVF z $T43 $T44  liveout {z $T42 $R $T44 }
+;ADDF $T42 $T44 $T45 
+;ensure(): $T42 has register r2 { r0->null r1->null r2->$T42 r3->$T44 }
+;ensure(): $T44 has register r3 { r0->null r1->null r2->$T42 r3->$T44 }
+;Switching owner of register r2 to $T45 { r0->null r1->null r2->$T42 r3->$T44 }
+;Spilling is removed: variable $T42 is dead after ADDF $T42 $T44 $T45  liveout {z $T45 $R }
+addr r3 r2
+;Freeing unused variable $T44
+;Spilling is removed: variable $T44 is dead after ADDF $T42 $T44 $T45  liveout {z $T45 $R }
+;STOREF 5.0 $T46 
+;ensure(): $T46 gets register r3 { r0->null r1->null r2->$T45 r3->$T46 }
+move 5.0 r3
+;DIVF z $T46 $T47 
+;ensure(): z gets register r0 { r0->z r1->null r2->$T45 r3->$T46 }
+;loading z to register r0
+move z r0
+;ensure(): $T46 has register r3 { r0->z r1->null r2->$T45 r3->$T46 }
+;Switching owner of register r0 to $T47 { r0->z r1->null r2->$T45 r3->$T46 }
+;Spilling variable: z
+move r0 z
+divr r3 r0
+;Freeing unused variable $T46
+;Spilling is removed: variable $T46 is dead after DIVF z $T46 $T47  liveout {z $T45 $T47 $R }
+;ADDF $T45 $T47 $T48 
+;ensure(): $T45 has register r2 { r0->$T47 r1->null r2->$T45 r3->null }
+;ensure(): $T47 has register r0 { r0->$T47 r1->null r2->$T45 r3->null }
+;Switching owner of register r2 to $T48 { r0->$T47 r1->null r2->$T45 r3->null }
+;Spilling is removed: variable $T45 is dead after ADDF $T45 $T47 $T48  liveout {z $T48 $R }
+addr r0 r2
+;Freeing unused variable $T47
+;Spilling is removed: variable $T47 is dead after ADDF $T45 $T47 $T48  liveout {z $T48 $R }
+;STOREF 6.0 $T49 
+;ensure(): $T49 gets register r0 { r0->$T49 r1->null r2->$T48 r3->null }
+move 6.0 r0
+;DIVF z $T49 $T50 
+;ensure(): z gets register r3 { r0->$T49 r1->null r2->$T48 r3->z }
+;loading z to register r3
+move z r3
+;ensure(): $T49 has register r0 { r0->$T49 r1->null r2->$T48 r3->z }
+;Switching owner of register r3 to $T50 { r0->$T49 r1->null r2->$T48 r3->z }
+;Spilling variable: z
+move r3 z
+divr r0 r3
+;Freeing unused variable $T49
+;Spilling is removed: variable $T49 is dead after DIVF z $T49 $T50  liveout {z $T50 $T48 $R }
+;ADDF $T48 $T50 $T51 
+;ensure(): $T48 has register r2 { r0->null r1->null r2->$T48 r3->$T50 }
+;ensure(): $T50 has register r3 { r0->null r1->null r2->$T48 r3->$T50 }
+;Switching owner of register r2 to $T51 { r0->null r1->null r2->$T48 r3->$T50 }
+;Spilling is removed: variable $T48 is dead after ADDF $T48 $T50 $T51  liveout {z $R $T51 }
+addr r3 r2
+;Freeing unused variable $T50
+;Spilling is removed: variable $T50 is dead after ADDF $T48 $T50 $T51  liveout {z $R $T51 }
+;STOREF 7.0 $T52 
+;ensure(): $T52 gets register r3 { r0->null r1->null r2->$T51 r3->$T52 }
+move 7.0 r3
+;DIVF z $T52 $T53 
+;ensure(): z gets register r0 { r0->z r1->null r2->$T51 r3->$T52 }
+;loading z to register r0
+move z r0
+;ensure(): $T52 has register r3 { r0->z r1->null r2->$T51 r3->$T52 }
+;Switching owner of register r0 to $T53 { r0->z r1->null r2->$T51 r3->$T52 }
+;Spilling is removed: variable z is dead after DIVF z $T52 $T53  liveout {$T53 $R $T51 }
+divr r3 r0
+;Freeing unused variable $T52
+;Spilling is removed: variable $T52 is dead after DIVF z $T52 $T53  liveout {$T53 $R $T51 }
+;ADDF $T51 $T53 $T54 
+;ensure(): $T51 has register r2 { r0->$T53 r1->null r2->$T51 r3->null }
+;ensure(): $T53 has register r0 { r0->$T53 r1->null r2->$T51 r3->null }
+;Switching owner of register r2 to $T54 { r0->$T53 r1->null r2->$T51 r3->null }
+;Spilling is removed: variable $T51 is dead after ADDF $T51 $T53 $T54  liveout {$T54 $R }
+addr r0 r2
+;Freeing unused variable $T53
+;Spilling is removed: variable $T53 is dead after ADDF $T51 $T53 $T54  liveout {$T54 $R }
+;STOREF $T54 t 
+;ensure(): $T54 has register r2 { r0->null r1->null r2->$T54 r3->null }
+;Freeing unused variable $T54
+;Spilling is removed: variable $T54 is dead after STOREF $T54 t  liveout {$R t }
+;ensure(): t gets register r2 { r0->null r1->null r2->t r3->null }
+;WRITEF t 
+;ensure(): t has register r2 { r0->null r1->null r2->t r3->null }
+sys writer r2
+;Freeing unused variable t
+;Spilling is removed: variable t is dead after WRITEF t  liveout {$R }
+;RET  
+;Spilling registers at end of Basic Block
+unlnk 
+ret 
+end
